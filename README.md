@@ -25,7 +25,6 @@ $ make blif
 # TODO
 
 * compute dividend in modulo.v as well
-* convert prio encoder in modulo.v to combinational circuit
 * port to iCEstick (both Lattice and Yosys toolchains)
 * get code reviewed by professional designer and fix accordingly
 * employ some fast [probabilistic tests](https://en.wikipedia.org/wiki/Primality_test#Probabilistic_tests)

@@ -19,9 +19,8 @@ parameter XW = {WIDTH{1'bx}};
 parameter X7 = 7'bx;
 
 parameter READY = 2'd0;
-parameter SHIFT = 2'd1;
-parameter SUB   = 2'd2;
-parameter ERROR = 2'd3;
+parameter SUB   = 2'd1;
+parameter ERROR = 2'd2;
 
 reg [3:0] state;
 reg go_prev;
@@ -42,7 +41,7 @@ function [7:0] msb;
   end
 endfunction
 
-always @(posedge clk)
+always @*
   msb_A <= msb(a);
 
 */
@@ -50,9 +49,9 @@ always @(posedge clk)
 integer ia;
 reg [7:0] msb_A;
 
-always @(posedge clk) begin
+always @* begin
   msb_A = 0;
-  // TODO: this could be done by splitting in halves on each iteration
+  // TODO: this could be sped up by splitting in halves on each iteration
   for (ia = HI; ia >= 0; ia = ia - 1)
     if (!msb_A && a[ia])
       msb_A = ia;
@@ -61,7 +60,7 @@ end
 integer ib;
 reg [7:0] msb_B;
 
-always @(posedge clk) begin
+always @* begin
   msb_B = 0;
   for (ib = HI; ib >= 0; ib = ib - 1)
     if (!msb_B && b[ib])
@@ -90,9 +89,10 @@ always @* begin
     if (b == 0) begin
       next_state = ERROR;
     end else begin
-      next_state = SHIFT;
+      next_state = SUB;
       next_A = a;
-      next_B = b;
+      next_B = b << max_shift;
+      next_shift = max_shift;
     end
   else
     case (state)
@@ -102,13 +102,6 @@ always @* begin
           next_A = A;
           next_B = B;
           next_shift = shift;
-        end
-      SHIFT:
-        begin
-          next_state = SUB;
-          next_A = A;
-          next_B = B << max_shift;
-          next_shift = max_shift;
         end
       SUB:
         if (B <= A) begin
