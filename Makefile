@@ -10,7 +10,8 @@ blif: bin/divmod.blif bin/primogen.blif
 bin/%_tb: src/%.v src/%_tb.v
 	iverilog $(IVFLAGS) -N$@.nl -o $@ $^
 
-bin/primogen_tb: src/divmod.v
+bin/divmod_tb: src/prio_enc.v
+bin/primogen_tb: src/divmod.v src/prio_enc.v
 
 bin/%.blif: src/%.v
 	iverilog $(IVFLAGS_SYNTH) -o $@ $^

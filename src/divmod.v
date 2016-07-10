@@ -26,50 +26,14 @@ parameter ERROR = 2'd2;
 reg [3:0] state;
 reg go_prev;
 
-/* This is nice but not supported by BLIF synthesis
+wire [7:0] a_msb;
+prio_enc a_pe(.x(a), .msb(a_msb));
 
-function [7:0] msb;
-  input [HI:0] x;
-  reg [7:0] bit;
-  integer i;
-  begin
-    bit = 0;
-    // TODO: this could be done by splitting in halves on each iteration
-    for (i = HI; i >= 0; i = i - 1)
-      if (!bit && x[i])
-        bit = i;
-    msb = bit;
-  end
-endfunction
-
-always @*
-  msb_A <= msb(a);
-
-*/
-
-integer ia;
-reg [7:0] msb_A;
-
-always @* begin
-  msb_A = 0;
-  // TODO: this could be sped up by splitting in halves on each iteration
-  for (ia = HI; ia >= 0; ia = ia - 1)
-    if (!msb_A && a[ia])
-      msb_A = ia;
-end
-
-integer ib;
-reg [7:0] msb_B;
-
-always @* begin
-  msb_B = 0;
-  for (ib = HI; ib >= 0; ib = ib - 1)
-    if (!msb_B && b[ib])
-      msb_B = ib;
-end
+wire [7:0] b_msb;
+prio_enc b_pe(.x(b), .msb(b_msb));
 
 wire [7:0] max_shift;
-assign max_shift = (msb_A > msb_B + 1) ? (msb_A - msb_B - 1) : 0;
+assign max_shift = (a_msb > b_msb + 1) ? (a_msb - b_msb - 1) : 0;
 
 reg [HI:0] next_state;
 reg [HI:0] next_sub;
@@ -153,7 +117,7 @@ always @(posedge clk)
   end
 
 //  initial
-//    $monitor("%t: go = %b, res = %h, state = %h, msb_A = %h, msb_B = %h, A = %h, B = %h, shift = %h", $time, go, res, state, msb_A, msb_B, A, B, shift);
+//    $monitor("%t: go = %b, res = %h, state = %h, a_msb = %h, b_msb = %h, A = %h, B = %h, shift = %h", $time, go, res, state, a_msb, b_msb, A, B, shift);
 
 endmodule
 
