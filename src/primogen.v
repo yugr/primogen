@@ -144,7 +144,7 @@ reg [HI:0] div;
 reg [HI:0] div_squared;
 reg mod_go;
 
-divmod d_m(
+divmod #(.WIDTH(WIDTH)) d_m(
   .clk(clk),
   .go(mod_go),
   .rst(rst),
