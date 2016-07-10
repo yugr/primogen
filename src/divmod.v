@@ -1,6 +1,6 @@
 `include "defines.v"
 
-module modulo #(
+module divmod #(
   parameter WIDTH = 16
 ) (
   input clk,
@@ -11,7 +11,8 @@ module modulo #(
   input [WIDTH - 1:0] b,
   output reg ready,
   output reg error,
-  output reg [WIDTH - 1:0] res
+  output reg [WIDTH - 1:0] div,
+  output reg [WIDTH - 1:0] mod
 );
 
 parameter HI = WIDTH - 1;
@@ -19,7 +20,7 @@ parameter XW = {WIDTH{1'bx}};
 parameter X7 = 7'bx;
 
 parameter READY = 2'd0;
-parameter SUB   = 2'd1;
+parameter SUBTRACT   = 2'd1;
 parameter ERROR = 2'd2;
 
 reg [3:0] state;
@@ -71,27 +72,28 @@ wire [7:0] max_shift;
 assign max_shift = (msb_A > msb_B + 1) ? (msb_A - msb_B - 1) : 0;
 
 reg [HI:0] next_state;
-reg [HI:0] next_A;
-reg [HI:0] next_B;
+reg [HI:0] next_sub;
 reg [7:0] next_shift;
-reg [HI:0] next_res;
+reg [HI:0] next_div;
+reg [HI:0] next_mod;
 
 always @* begin
   // FIXME: assign to prev. state instead?
   next_state = ERROR;
-  next_A = XW;
-  next_B = XW;
+  next_sub = XW;
   next_shift = X7;
 
-  next_res = res;
+  next_div = div;
+  next_mod = mod;
 
   if (go && !go_prev)
     if (b == 0) begin
       next_state = ERROR;
     end else begin
-      next_state = SUB;
-      next_A = a;
-      next_B = b << max_shift;
+      next_state = SUBTRACT;
+      next_div = 0;
+      next_mod = a;
+      next_sub = b << max_shift;
       next_shift = max_shift;
     end
   else
@@ -99,35 +101,32 @@ always @* begin
       default:  // FIXME: undef for unknown states
         begin
           next_state = READY;
-          next_A = A;
-          next_B = B;
+          next_sub = sub;
           next_shift = shift;
         end
-      SUB:
-        if (B <= A) begin
+      SUBTRACT:
+        if (sub <= mod) begin
           next_state = state;
-          next_A = A - B;
-          next_B = B;
+          next_div = div + (1 << shift);
+          next_mod = mod - sub;
+          next_sub = sub;
           next_shift = shift;
-        end else if (B > A)
+        end else if (sub > mod)
           if (shift > 0) begin
             // TODO: we can do faster than that by immediately shifting to next msb of A
             next_state = state;
-            next_A = A;
-            next_B = B >> 1;
+            next_sub = sub >> 1;
             next_shift = shift - 1;
           end else begin
             `assert(shift, 0)
             next_state = READY;
-            next_res = A;
           end
     endcase
 end
 
 // TODO: should I merge A with res? This reduces regcount but exposes internal
 // details...
-reg [HI:0] A;
-reg [HI:0] B;
+reg [HI:0] sub;
 reg [7:0] shift;
 
 always @(posedge clk)
@@ -135,22 +134,22 @@ always @(posedge clk)
     // TODO: is it a good practice to explicitly undefine all things?
     // TODO: best approach to unify code snippets like this one?
     state <= READY;
-    A <= XW;
-    B <= XW;
+    mod <= XW;
+    div <= XW;
+    sub <= XW;
     shift <= X7;
     go_prev <= 0;
     ready <= 1;
     error <= 0;
-    res <= XW;
   end else begin
     state <= next_state;
-    A <= next_A;
-    B <= next_B;
+    mod <= next_mod;
+    div <= next_div;
+    sub <= next_sub;
     shift <= next_shift;
     go_prev <= go;
     ready = (next_state == READY || next_state == ERROR);
     error = (next_state == ERROR);
-    res <= next_res;
   end
 
 //  initial

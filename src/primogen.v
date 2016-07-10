@@ -144,7 +144,7 @@ reg [HI:0] div;
 reg [HI:0] div_squared;
 reg mod_go;
 
-modulo mod(
+divmod d_m(
   .clk(clk),
   .go(mod_go),
   .rst(rst),
@@ -152,7 +152,7 @@ modulo mod(
   .b(div),
   .ready(mod_ready),
   .error(mod_error),
-  .res(mod_res));
+  .mod(mod_res));
 
 always @(posedge clk)
   if (rst) begin
