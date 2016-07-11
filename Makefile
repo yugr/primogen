@@ -4,6 +4,7 @@ IVFLAGS = -Wall -Isrc
 IVFLAGS_SYNTH = $(IVFLAGS) -tblif -DSYNTH
 
 all: bin/divmod_tb bin/primogen_tb
+all: bin/divmod.blif bin/primogen.blif
 
 blif: bin/divmod.blif bin/primogen.blif
 
@@ -16,7 +17,8 @@ bin/primogen_tb: src/divmod.v src/prio_enc.v
 bin/%.blif: src/%.v
 	iverilog $(IVFLAGS_SYNTH) -o $@ $^
 
-bin/primogen.blif: src/divmod.v
+bin/divmod.blif: src/prio_enc.v
+bin/primogen.blif: src/divmod.v src/prio_enc.v
 
 test: test-divmod test-primogen
 

@@ -5,20 +5,8 @@ module prio_enc #(
   output [7:0] msb
 );
 
-/* Simple but slow
-integer i;
-reg [7:0] msb;
-
-always @* begin
-  msb = 0;
-  // TODO: this could be sped up by splitting in halves on each iteration
-  for (i = HI; i >= 0; i = i - 1)
-    if (!msb && a[i])
-      msb = i;
-end
-*/
-
 /* Concise but not supported by Icarus BLIF backend.
+
 function [7:0] get_msb;
   input [HI:0] x;
   reg [7:0] bit;
@@ -37,6 +25,8 @@ always @*
   msb = get_msb(a);
 */
 
+/* Fast but not synthesizable by Icarus BLIF backend
+
 integer start, width;
 reg [7:0] msb;
 
@@ -48,6 +38,19 @@ always @* begin
     start = (|(x >> width)) ? (start + width) : start;
   end
   msb = start;
+end
+*/
+
+// Slow but Icarus fails at anything more complicated
+
+integer i;
+reg [7:0] msb;
+
+always @* begin
+  msb = 0;
+  for (i = WIDTH - 1; i >= 0; i = i - 1)
+    if (!msb && x[i])
+      msb = i;
 end
 
 endmodule
