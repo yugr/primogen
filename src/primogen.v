@@ -1,4 +1,4 @@
-`include "defines.v"
+`include "defines.vh"
 
 module primegen #(
   parameter WIDTH = 16

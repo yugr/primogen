@@ -1,4 +1,4 @@
-`include "defines.v"
+`include "defines.vh"
 
 module divmod #(
   parameter WIDTH = 16
