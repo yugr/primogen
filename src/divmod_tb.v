@@ -39,13 +39,16 @@ initial begin
     mod = a % b;
     if (!m1_ready) begin
       $display("FAILED -- A=%d, B=%d, READY=0", a, b);
-      $finish;
+      $finish(1);
+    end else if (b != 0 && (^m1_div === 1'bx || ^m1_mod === 1'bx)) begin
+      $display("FAILED -- A=%d, B=%d, UNDEF (%d %d)", a, b, m1_div, m1_mod);
+      $finish(1);
     end else if (div != m1_div) begin
       $display("FAILED -- A=%d, B=%d, DIV=%d (should be %d)", a, b, m1_div, div);
-      $finish;
+      $finish(1);
     end else if (mod != m1_mod) begin
       $display("FAILED -- A=%d, B=%d, MOD=%d (should be %d)", a, b, m1_mod, mod);
-      $finish;
+      $finish(1);
     end
   end
   $finish;

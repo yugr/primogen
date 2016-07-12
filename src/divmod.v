@@ -108,7 +108,7 @@ always @(posedge clk)
   end
 
 //  initial
-//    $monitor("%t: go = %b, res = %h, state = %h, a_msb = %h, b_msb = %h, A = %h, B = %h, shift = %h", $time, go, res, state, a_msb, b_msb, A, B, shift);
+//    $monitor("%t: go=%b, a=%h, b=%h, mod=%h, state=%h, a_msb=%h, b_msb=%h, sub=%h, shift=%h", $time, go, a, b, mod, state, a_msb, b_msb, sub, shift);
 
 endmodule
 

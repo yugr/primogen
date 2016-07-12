@@ -38,6 +38,8 @@ reg [HI:0] next_div_squared;
 reg next_mod_go;
 reg [HI:0] next_res;
 
+`define OPT
+
 always @* begin
   next_state = state;
   next_p = p;
@@ -50,12 +52,15 @@ always @* begin
   if (go && !go_prev) begin
     // Search for next prime
     next_state = CHECK_DIVS;
-    // next_p = res + 1;
+`ifdef OPT
     case (res)
       1: next_p = 2;
       2: next_p = 3;
       default: next_p = res + 2;
     endcase
+`else
+    next_p = res + 1;
+`endif
     next_div = 2;
     next_div_squared = 4;
   end else
@@ -83,14 +88,17 @@ always @* begin
           next_state = CHECK_DIVS;
           if (mod_res == 0) begin
             // Divisable => abort and try next candidate
-            // next_p = p + 1;
+`ifdef OPT
             next_p = p + 2;
+`else
+            next_p = p + 1;
+`endif
             next_div = 2;
             next_div_squared = 4;
           end else begin
             // Not divisable => try next divisor
-            // next_div_squared = div_squared + (div << 2) + 4;
-            // next_div = div + 1;
+`ifdef OPT
+            // Optimize for most common divisors
             case (div)
               2:
                 begin
@@ -107,12 +115,17 @@ always @* begin
                   next_div = 17;
                   next_div_squared = 289;
                 end
+              // 3, 5, 11 and 17 covered in default branch
               default:
                 begin
-                  next_div = div + 2; // Also works for 3, 5, 11 and 17
+                  next_div = div + 2;
                   next_div_squared = div_squared + (div << 2) + 4;
                 end
             endcase
+`else
+            next_div_squared = div_squared + (div << 1) + 1;
+            next_div = div + 1;
+`endif
           end
         end else
           ; // Keep waiting
