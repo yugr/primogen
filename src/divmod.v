@@ -29,10 +29,10 @@ reg [3:0] state;
 reg go_prev;
 
 wire [7:0] a_msb;
-prio_enc #(.WIDTH(WIDTH)) a_pe(.x(a), .msb(a_msb));
+prio_enc #(.WIDTH_LOG(WIDTH_LOG)) a_pe(.x(a), .msb(a_msb));
 
 wire [7:0] b_msb;
-prio_enc #(.WIDTH(WIDTH)) b_pe(.x(b), .msb(b_msb));
+prio_enc #(.WIDTH_LOG(WIDTH_LOG)) b_pe(.x(b), .msb(b_msb));
 
 wire [7:0] max_shift;
 assign max_shift = (a_msb > b_msb + 1) ? (a_msb - b_msb - 1) : 0;
