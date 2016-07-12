@@ -26,7 +26,7 @@ $ make blif
 
 * port to iCEstick (both Lattice and Yosys toolchains)
 * get code reviewed by professional designer and fix accordingly
-* employ some fast [probabilistic tests](https://en.wikipedia.org/wiki/Primality_test#Probabilistic_tests)
+* use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))
 * TODOs and FIXMEs in code
 * teach Iverilog to synthesize encoder implemented with recursive functions (?)
 
