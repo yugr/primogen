@@ -1,3 +1,5 @@
+`include "defines.vh"
+
 module prio_enc #(
   parameter WIDTH_LOG = 4
 ) (
@@ -6,6 +8,8 @@ module prio_enc #(
 );
 
 localparam WIDTH = 1 << WIDTH_LOG;
+
+`define FAST_ENCODER
 
 `ifndef FAST_ENCODER
 // Slow but simple
@@ -20,18 +24,27 @@ always @* begin
       msb = i;
 end
 `else
-// Faster
+// Faster but not sure that synthesizers will understand that interm. results
+// is decreasing in size...
 
 integer i, start, width;
 reg [7:0] msb;
+reg [WIDTH - 1:0] part;
 
 always @* begin
   start = 0;
   width = WIDTH;
-  for (i = 0; i < WIDTH_LOG - 1; i = i + 1) begin
+  part = x;
+  for (i = 0; i < WIDTH_LOG; i = i + 1) begin
     width = width >> 1;
-    start = (|(x >> width)) ? (start + width) : start;
+    // Will synthesizer understand that part is two times smaller?!
+    if (|(part >> width)) begin
+      start = start + width;
+      part = part >> width;
+    end
+    part = part & ((1 << width) - 1);
   end
+  `assert(width, 1)
   msb = start;
 end
 `endif
