@@ -23,7 +23,7 @@ primegen gen(
 `define CHECK(v) if (gen_res != v) $display("error: expected gen_res == %h (got %h)", v, gen_res);
 
 parameter N = 13;
-reg [N-1:0] primes [31:0];
+reg [99:0] primes [31:0];
 integer i;
 
 initial begin
@@ -42,6 +42,9 @@ initial begin
   primes[11] = 31;
   primes[12] = 37;
 
+  for (i = N; i < 100; i = i + 1)
+    primes[i] = 0;
+
   @(negedge clk);
   rst = 1;
   @(posedge clk);
@@ -51,10 +54,13 @@ initial begin
   for (i = 0; i < N; ++i) begin
     if (!gen_ready) begin
       $display("FAILED -- I=%d, READY=0", i);
-      $finish;
+      $finish(1);
+    end else if (^gen_res === 1'bx) begin
+      $display("FAILED -- I=%d, UNDEF (%d)", i, gen_res);
+      $finish(1);
     end else if (gen_res != primes[i]) begin
       $display("FAILED -- I=%d, PRIME=%d (should be %d)", i, gen_res, primes[i]);
-      $finish;
+      $finish(1);
     end
 
     // Ask for next prime
