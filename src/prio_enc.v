@@ -1,9 +1,11 @@
 module prio_enc #(
-  parameter WIDTH = 16
+  parameter WIDTH_LOG = 4
 ) (
-  input [WIDTH-1:0] x,
+  input [(1 << WIDTH_LOG) - 1:0] x,
   output [7:0] msb
 );
+
+localparam WIDTH = 1 << WIDTH_LOG;
 
 /* Concise but not supported by Icarus BLIF backend.
 

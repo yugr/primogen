@@ -1,7 +1,7 @@
 `include "defines.vh"
 
 module primegen #(
-  parameter WIDTH = 16
+  parameter WIDTH_LOG = 4
 ) (
   input clk,
   input go,
@@ -9,18 +9,20 @@ module primegen #(
   // TODO: input [WIDTH - 1:0] from
   output reg ready,
   output reg error,
-  output reg [WIDTH - 1:0] res
+  output reg [(1 << WIDTH_LOG) - 1:0] res
 );
 
-parameter HI = WIDTH - 1;
-parameter XW = {WIDTH{1'bx}};
-parameter X7 = 7'bx;
+localparam WIDTH = 1 << WIDTH_LOG;
+localparam HI = WIDTH - 1;
 
-parameter READY = 3'd0;
-parameter ERROR = 3'd1;
-parameter CHECK_DIVS = 3'd2;
-parameter WAIT_MOD_DLY = 3'd3;
-parameter WAIT_MOD = 3'd4;
+localparam XW = {WIDTH{1'bx}};
+localparam X7 = 7'bx;
+
+localparam READY = 3'd0;
+localparam ERROR = 3'd1;
+localparam CHECK_DIVS = 3'd2;
+localparam WAIT_MOD_DLY = 3'd3;
+localparam WAIT_MOD = 3'd4;
 
 reg go_prev;
 
@@ -144,7 +146,7 @@ reg [HI:0] div;
 reg [HI:0] div_squared;
 reg mod_go;
 
-divmod #(.WIDTH(WIDTH)) d_m(
+divmod #(.WIDTH_LOG(WIDTH_LOG)) d_m(
   .clk(clk),
   .go(mod_go),
   .rst(rst),

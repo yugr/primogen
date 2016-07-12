@@ -1,27 +1,29 @@
 `include "defines.vh"
 
 module divmod #(
-  parameter WIDTH = 16
+  parameter WIDTH_LOG = 4
 ) (
   input clk,
   input go,
   input rst,
   // TODO: can I somehow use the HI definition from below?
-  input [WIDTH - 1:0] a,
-  input [WIDTH - 1:0] b,
+  input [(1 << WIDTH_LOG) - 1:0] a,
+  input [(1 << WIDTH_LOG) - 1:0] b,
   output reg ready,
   output reg error,
-  output reg [WIDTH - 1:0] div,
-  output reg [WIDTH - 1:0] mod
+  output reg [(1 << WIDTH_LOG) - 1:0] div,
+  output reg [(1 << WIDTH_LOG) - 1:0] mod
 );
 
-parameter HI = WIDTH - 1;
-parameter XW = {WIDTH{1'bx}};
-parameter X7 = 7'bx;
+localparam WIDTH = 1 << WIDTH_LOG;
+localparam HI = WIDTH - 1;
 
-parameter READY = 2'd0;
-parameter SUBTRACT   = 2'd1;
-parameter ERROR = 2'd2;
+localparam XW = {WIDTH{1'bx}};
+localparam X7 = 7'bx;
+
+localparam READY = 2'd0;
+localparam SUBTRACT   = 2'd1;
+localparam ERROR = 2'd2;
 
 reg [3:0] state;
 reg go_prev;
