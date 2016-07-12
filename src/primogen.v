@@ -39,14 +39,13 @@ reg next_mod_go;
 reg [HI:0] next_res;
 
 always @* begin
-  // FIXME: assign to prev. state instead?
-  next_state = ERROR;
-  next_p = XW;
-  next_div = XW;
-  next_div_squared = XW;
+  next_state = state;
+  next_p = p;
+  next_div = div;
+  next_div_squared = div_squared;
+  next_res = res;
 
   next_mod_go = 0;
-  next_res = res;
 
   if (go && !go_prev) begin
     // Search for next prime
@@ -61,24 +60,13 @@ always @* begin
     next_div_squared = 4;
   end else
     case (state)
-      default:  // FIXME: undef for unknown states
-        begin
-          next_state = state;
-          next_p = p;
-          next_div = div;
-          next_div_squared = div_squared;
-        end
       CHECK_DIVS:
         if (div_squared > p) begin
           // None of potential divisors matched => number is prime!
           next_state = READY;
-          next_p = p;
           next_res = p;
         end else begin
           next_state = WAIT_MOD_DLY;
-          next_p = p;
-          next_div = div;
-          next_div_squared = div_squared;
           next_mod_go = 1;
         end
       WAIT_MOD_DLY:
@@ -86,9 +74,6 @@ always @* begin
           // This state gives modulo calculator time to reset ready bit.
           // TODO: not sure it's the best approach...
           next_state = WAIT_MOD;
-          next_p = p;
-          next_div = div;
-          next_div_squared = div_squared;
         end
       WAIT_MOD:
         if (mod_error) begin
@@ -104,7 +89,6 @@ always @* begin
             next_div_squared = 4;
           end else begin
             // Not divisable => try next divisor
-            next_p = p;
             // next_div_squared = div_squared + (div << 2) + 4;
             // next_div = div + 1;
             case (div)
@@ -130,13 +114,8 @@ always @* begin
                 end
             endcase
           end
-        end else begin
-          // Keep waiting
-          next_state = state;
-          next_p = p;
-          next_div = div;
-          next_div_squared = div_squared;
-        end
+        end else
+          ; // Keep waiting
     endcase
 end
 

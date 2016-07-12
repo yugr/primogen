@@ -44,54 +44,43 @@ reg [HI:0] next_div;
 reg [HI:0] next_mod;
 
 always @* begin
-  // FIXME: assign to prev. state instead?
-  next_state = ERROR;
-  next_sub = XW;
-  next_shift = X7;
-
+  next_state = state;
+  next_sub = next_sub;
+  next_shift = next_shift;
   next_div = div;
   next_mod = mod;
 
   if (go && !go_prev)
     if (b == 0) begin
       next_state = ERROR;
+      next_sub = XW;
+      next_shift = X7;
+      next_div = XW;
+      next_mod = XW;
     end else begin
       next_state = SUBTRACT;
-      next_div = 0;
-      next_mod = a;
       next_sub = b << max_shift;
       next_shift = max_shift;
+      next_div = 0;
+      next_mod = a;
     end
-  else
-    case (state)
-      default:  // FIXME: undef for unknown states
-        begin
-          next_state = READY;
-          next_sub = sub;
-          next_shift = shift;
-        end
-      SUBTRACT:
-        if (sub <= mod) begin
-          next_state = state;
-          next_div = div + (1 << shift);
-          next_mod = mod - sub;
-          next_sub = sub;
-          next_shift = shift;
-        end else if (sub > mod)
-          if (shift > 0) begin
-            // TODO: we can do faster than that by immediately shifting to next msb of A
-            next_state = state;
-            next_sub = sub >> 1;
-            next_shift = shift - 1;
-          end else begin
-            `assert(shift, 0)
-            next_state = READY;
-          end
-    endcase
+  else if (state == SUBTRACT)
+    if (sub <= mod) begin
+      next_div = div + (1 << shift);
+      next_mod = mod - sub;
+    end else if (sub > mod)
+      if (shift > 0) begin
+        // TODO: we can do faster than that by immediately shifting to next msb of A
+        next_sub = sub >> 1;
+        next_shift = shift - 1;
+      end else begin
+        `assert(shift, 0)
+        next_state = READY;
+        next_sub = XW;
+        next_shift = XW;
+      end
 end
 
-// TODO: should I merge A with res? This reduces regcount but exposes internal
-// details...
 reg [HI:0] sub;
 reg [7:0] shift;
 
@@ -100,19 +89,19 @@ always @(posedge clk)
     // TODO: is it a good practice to explicitly undefine all things?
     // TODO: best approach to unify code snippets like this one?
     state <= READY;
-    mod <= XW;
-    div <= XW;
     sub <= XW;
     shift <= X7;
+    mod <= XW;
+    div <= XW;
     go_prev <= 0;
     ready <= 1;
     error <= 0;
   end else begin
     state <= next_state;
-    mod <= next_mod;
-    div <= next_div;
     sub <= next_sub;
     shift <= next_shift;
+    mod <= next_mod;
+    div <= next_div;
     go_prev <= go;
     ready = (next_state == READY || next_state == ERROR);
     error = (next_state == ERROR);
