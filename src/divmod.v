@@ -26,7 +26,6 @@ localparam SUBTRACT   = 2'd1;
 localparam ERROR = 2'd2;
 
 reg [3:0] state;
-reg go_prev;
 
 wire [7:0] a_msb;
 prio_enc #(.WIDTH_LOG(WIDTH_LOG)) a_pe(.x(a), .msb(a_msb));
@@ -37,7 +36,7 @@ prio_enc #(.WIDTH_LOG(WIDTH_LOG)) b_pe(.x(b), .msb(b_msb));
 wire [7:0] max_shift;
 assign max_shift = (a_msb > b_msb + 1) ? (a_msb - b_msb - 1) : 0;
 
-reg [HI:0] next_state;
+reg [1:0] next_state;
 reg [HI:0] next_sub;
 reg [7:0] next_shift;
 reg [HI:0] next_div;
@@ -45,41 +44,62 @@ reg [HI:0] next_mod;
 
 always @* begin
   next_state = state;
-  next_sub = next_sub;
-  next_shift = next_shift;
+  next_sub = sub;
+  next_shift = shift;
   next_div = div;
   next_mod = mod;
 
-  if (go && !go_prev)
-    if (b == 0) begin
-      next_state = ERROR;
-      next_sub = XW;
-      next_shift = X7;
-      next_div = XW;
-      next_mod = XW;
-    end else begin
-      next_state = SUBTRACT;
-      next_sub = b << max_shift;
-      next_shift = max_shift;
-      next_div = 0;
-      next_mod = a;
-    end
-  else if (state == SUBTRACT)
-    if (sub <= mod) begin
-      next_div = div + (1 << shift);
-      next_mod = mod - sub;
-    end else if (sub > mod)
-      if (shift > 0) begin
+  case (state)
+    READY, ERROR:
+      if (go) begin
+        if (b == 0) begin
+          next_state = ERROR;
+          next_sub = XW;
+          next_shift = X7;
+          next_div = XW;
+          next_mod = XW;
+        end else begin
+          next_state = SUBTRACT;
+          next_sub = b << max_shift;
+          next_shift = max_shift;
+          next_div = 0;
+          next_mod = a;
+        end
+      end else begin
+        // Stay in READY and do nothing
+      end
+
+    SUBTRACT:
+      if (sub <= mod) begin
+        next_div = div + (1 << shift);
+        next_mod = mod - sub;
+      end else if (shift > 0) begin  // sub > mod
         // TODO: we can do faster than that by immediately shifting to next msb of A
         next_sub = sub >> 1;
         next_shift = shift - 1;
       end else begin
-        `assert(shift, 0)
         next_state = READY;
         next_sub = XW;
         next_shift = XW;
       end
+
+    default:
+      begin
+        next_state = 2'bx;
+        next_sub = XW;
+        next_shift = X7;
+        next_div = XW;
+        next_mod = XW;
+      end
+
+  endcase
 end
+
+wire next_ready;
+assign next_ready = next_state == READY || next_state == ERROR;
+
+wire next_error;
+assign next_error = next_state == ERROR;
 
 reg [HI:0] sub;
 reg [7:0] shift;
@@ -93,7 +113,6 @@ always @(posedge clk)
     shift <= X7;
     mod <= XW;
     div <= XW;
-    go_prev <= 0;
     ready <= 1;
     error <= 0;
   end else begin
@@ -102,13 +121,12 @@ always @(posedge clk)
     shift <= next_shift;
     mod <= next_mod;
     div <= next_div;
-    go_prev <= go;
-    ready = (next_state == READY || next_state == ERROR);
-    error = (next_state == ERROR);
+    ready <= next_ready;
+    error <= next_error;
   end
 
 //  initial
-//    $monitor("%t: go=%b, a=%h, b=%h, mod=%h, state=%h, a_msb=%h, b_msb=%h, sub=%h, shift=%h", $time, go, a, b, mod, state, a_msb, b_msb, sub, shift);
+//    $monitor("%t: go=%b, a=%h, b=%h, mod=%h, state=%h, a_msb=%h, b_msb=%h, sub=%h, shift=%h, ready=%b", $time, go, a, b, mod, state, a_msb, b_msb, sub, shift, ready);
 
 endmodule
 

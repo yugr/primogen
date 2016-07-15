@@ -24,8 +24,6 @@ localparam CHECK_DIVS = 3'd2;
 localparam WAIT_MOD_DLY = 3'd3;
 localparam WAIT_MOD = 3'd4;
 
-reg go_prev;
-
 wire mod_ready;
 wire mod_error;
 wire [HI:0] mod_res;
@@ -38,7 +36,7 @@ reg [HI:0] next_div_squared;
 reg next_mod_go;
 reg [HI:0] next_res;
 
-`define OPT
+`define FAST  // Only for debugging
 
 always @* begin
   next_state = state;
@@ -46,90 +44,107 @@ always @* begin
   next_div = div;
   next_div_squared = div_squared;
   next_res = res;
+  next_mod_go = mod_go;
 
-  next_mod_go = 0;
-
-  if (go && !go_prev) begin
-    // Search for next prime
-    next_state = CHECK_DIVS;
-`ifdef OPT
-    case (res)
-      1: next_p = 2;
-      2: next_p = 3;
-      default: next_p = res + 2;
-    endcase
+  case (state)
+    READY, ERROR:
+      if (go) begin
+        // Search for next prime
+        next_state = CHECK_DIVS;
+`ifdef FAST
+        case (res)
+          1: next_p = 2;
+          2: next_p = 3;
+          default: next_p = res + 2;
+        endcase
 `else
-    next_p = res + 1;
+        next_p = res + 1;
 `endif
-    next_div = 2;
-    next_div_squared = 4;
-  end else
-    case (state)
-      CHECK_DIVS:
-        if (div_squared > p) begin
-          // None of potential divisors matched => number is prime!
-          next_state = READY;
-          next_res = p;
+        next_div = 2;
+        next_div_squared = 4;
+      end else begin
+        // Stay in READY and do nothing
+      end
+
+    CHECK_DIVS:
+      if (div_squared > p) begin
+        // None of potential divisors matched => number is prime!
+        next_state = READY;
+        next_res = p;
+      end else begin
+        next_state = WAIT_MOD_DLY;
+        next_mod_go = 1;
+      end
+
+    WAIT_MOD_DLY:
+      begin
+        // Wait state to allow divmod to latch inputs and set proper ready bit
+        next_state = WAIT_MOD;
+        next_mod_go = 0;
+      end
+
+    WAIT_MOD:
+      if (mod_error) begin
+        next_state = ERROR;
+      end else if (mod_ready) begin
+        // Modulo is ready for inspection
+        next_state = CHECK_DIVS;
+        if (mod_res == 0) begin
+          // Divisable => abort and try next candidate
+`ifdef FAST
+          next_p = p + 2;
+`else
+          next_p = p + 1;
+`endif
+          next_div = 2;
+          next_div_squared = 4;
         end else begin
-          next_state = WAIT_MOD_DLY;
-          next_mod_go = 1;
-        end
-      WAIT_MOD_DLY:
-        begin
-          // This state gives modulo calculator time to reset ready bit.
-          // TODO: not sure it's the best approach...
-          next_state = WAIT_MOD;
-        end
-      WAIT_MOD:
-        if (mod_error) begin
-          next_state = ERROR;
-        end else if (mod_ready) begin
-          // Modulo is ready for inspection
-          next_state = CHECK_DIVS;
-          if (mod_res == 0) begin
-            // Divisable => abort and try next candidate
-`ifdef OPT
-            next_p = p + 2;
+          // Not divisable => try next divisor
+`ifdef FAST
+          // Optimize for most common divisors
+          case (div)
+            2:
+              begin
+                next_div = 3;
+                next_div_squared = 9;
+              end
+            7:
+              begin
+                next_div = 11;
+                next_div_squared = 121;
+              end
+            13:
+              begin
+                next_div = 17;
+                next_div_squared = 289;
+              end
+            // 3, 5, 11 and 17 covered in default branch
+            default:
+              begin
+                next_div = div + 2;
+                next_div_squared = div_squared + (div << 2) + 4;
+              end
+          endcase
 `else
-            next_p = p + 1;
+          next_div_squared = div_squared + (div << 1) + 1;
+          next_div = div + 1;
 `endif
-            next_div = 2;
-            next_div_squared = 4;
-          end else begin
-            // Not divisable => try next divisor
-`ifdef OPT
-            // Optimize for most common divisors
-            case (div)
-              2:
-                begin
-                  next_div = 3;
-                  next_div_squared = 9;
-                end
-              7:
-                begin
-                  next_div = 11;
-                  next_div_squared = 121;
-                end
-              13:
-                begin
-                  next_div = 17;
-                  next_div_squared = 289;
-                end
-              // 3, 5, 11 and 17 covered in default branch
-              default:
-                begin
-                  next_div = div + 2;
-                  next_div_squared = div_squared + (div << 2) + 4;
-                end
-            endcase
-`else
-            next_div_squared = div_squared + (div << 1) + 1;
-            next_div = div + 1;
-`endif
-          end
-        end else
-          ; // Keep waiting
-    endcase
+        end
+      end else begin
+        // Stay in WAIT_MOD and do nothing
+      end
+
+    default:
+      begin
+        next_state = 3'bx;
+        next_p = XW;
+        next_div = XW;
+        next_div_squared = XW;
+        next_res = XW;
+        next_mod_go = 1'bx;
+      end
+
+  endcase
 end
 
 reg [2:0] state;
@@ -148,6 +163,12 @@ divmod #(.WIDTH_LOG(WIDTH_LOG)) d_m(
   .error(mod_error),
   .mod(mod_res));
 
+wire next_ready;
+assign next_ready = next_state == READY || next_state == ERROR;
+
+wire next_error;
+assign next_error = next_state == ERROR;
+
 always @(posedge clk)
   if (rst) begin
     // Start by outputting the very first prime...
@@ -156,7 +177,6 @@ always @(posedge clk)
     div <= XW;
     div_squared <= XW;
     mod_go <= 0;
-    go_prev <= 0;
     ready <= 1;
     error <= 0;
     res <= 1;
@@ -166,9 +186,8 @@ always @(posedge clk)
     div <= next_div;
     div_squared <= next_div_squared;
     mod_go <= next_mod_go;
-    go_prev <= go;
-    ready <= (next_state == READY || next_state == ERROR);
-    error <= (next_state == ERROR);
+    ready <= next_ready;
+    error <= next_error;
     res <= next_res;
   end
 

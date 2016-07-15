@@ -28,6 +28,13 @@ reg [15:0] div;
 reg [15:0] mod;
 
 initial begin
+
+  @(negedge clk);
+  rst = 1;
+  @(posedge clk);
+  @(negedge clk) rst = 0;
+  #10;
+
   for (a = 0; a < 20; a = a + 1)
   for (b = 0; b < 20; b = b + 1) begin
     @(negedge clk);
