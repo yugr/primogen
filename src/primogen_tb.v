@@ -1,4 +1,4 @@
-module primegen_tb;
+module primogen_tb;
 
 reg clk = 0;
 
@@ -15,7 +15,7 @@ parameter N = 13;
 reg [99:0] primes [31:0];
 integer i;
 
-primegen gen(
+primogen gen(
   .clk(clk),
   .go(go),
   .rst(rst),

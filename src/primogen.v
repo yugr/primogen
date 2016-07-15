@@ -1,6 +1,6 @@
 `include "defines.vh"
 
-module primegen #(
+module primogen #(
   parameter WIDTH_LOG = 4
 ) (
   input clk,
