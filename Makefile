@@ -1,7 +1,7 @@
 $(shell mkdir -p bin)
 
 IVFLAGS = -Wall -Isrc
-IVFLAGS_SYNTH = $(IVFLAGS) -tblif -DSYNTH
+IVFLAGS_SYNTH = $(IVFLAGS) -tblif -Dsynthesis
 
 all: bin/divmod_tb bin/primogen_tb
 all: bin/divmod.blif bin/primogen.blif bin/prio_enc.blif

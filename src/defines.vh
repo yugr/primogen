@@ -1,4 +1,4 @@
-`ifdef SYNTH
+`ifdef synthesis
 `define assert(sig, val) ;
 `define unreachable ;
 `define mark ;
