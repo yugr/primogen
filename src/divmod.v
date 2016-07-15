@@ -26,21 +26,29 @@ localparam SUBTRACT   = 2'd1;
 localparam ERROR = 2'd2;
 
 reg [3:0] state;
-
-wire [7:0] a_msb;
-prio_enc #(.WIDTH_LOG(WIDTH_LOG)) a_pe(.x(a), .msb(a_msb));
-
-wire [7:0] b_msb;
-prio_enc #(.WIDTH_LOG(WIDTH_LOG)) b_pe(.x(b), .msb(b_msb));
-
-wire [7:0] max_shift;
-assign max_shift = (a_msb > b_msb + 1) ? (a_msb - b_msb - 1) : 0;
+reg [HI:0] sub;
+reg [7:0] shift;
 
 reg [1:0] next_state;
 reg [HI:0] next_sub;
 reg [7:0] next_shift;
 reg [HI:0] next_div;
 reg [HI:0] next_mod;
+
+wire next_ready;
+wire next_error;
+
+wire [7:0] a_msb;
+wire [7:0] b_msb;
+wire [7:0] max_shift;
+
+prio_enc #(.WIDTH_LOG(WIDTH_LOG)) a_pe(.x(a), .msb(a_msb));
+prio_enc #(.WIDTH_LOG(WIDTH_LOG)) b_pe(.x(b), .msb(b_msb));
+
+assign max_shift = (a_msb > b_msb + 1) ? (a_msb - b_msb - 1) : 0;
+
+assign next_ready = next_state == READY || next_state == ERROR;
+assign next_error = next_state == ERROR;
 
 always @* begin
   next_state = state;
@@ -94,15 +102,6 @@ always @* begin
 
   endcase
 end
-
-wire next_ready;
-assign next_ready = next_state == READY || next_state == ERROR;
-
-wire next_error;
-assign next_error = next_state == ERROR;
-
-reg [HI:0] sub;
-reg [7:0] shift;
 
 always @(posedge clk)
   if (rst) begin

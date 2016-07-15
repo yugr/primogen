@@ -1,7 +1,6 @@
 module primegen_tb;
 
 reg clk = 0;
-always #5 clk = !clk;
 
 reg go = 0;
 reg rst = 0;
@@ -12,6 +11,10 @@ wire gen_ready;
 wire gen_error;
 wire [15:0] gen_res;
 
+parameter N = 13;
+reg [99:0] primes [31:0];
+integer i;
+
 primegen gen(
   .clk(clk),
   .go(go),
@@ -20,11 +23,7 @@ primegen gen(
   .error(gen_error),
   .res(gen_res));
 
-`define CHECK(v) if (gen_res != v) $display("error: expected gen_res == %h (got %h)", v, gen_res);
-
-parameter N = 13;
-reg [99:0] primes [31:0];
-integer i;
+always #5 clk = !clk;
 
 initial begin
   // Need to test many cause of optimizations for first N primes

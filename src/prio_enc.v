@@ -9,9 +9,9 @@ module prio_enc #(
 
 localparam WIDTH = 1 << WIDTH_LOG;
 
-`define FAST_ENCODER
+`define FAST
 
-`ifndef FAST_ENCODER
+`ifndef FAST
 // Slow but simple
 
 integer i;

@@ -24,11 +24,14 @@ localparam CHECK_DIVS = 3'd2;
 localparam WAIT_MOD_DLY = 3'd3;
 localparam WAIT_MOD = 3'd4;
 
-wire mod_ready;
-wire mod_error;
-wire [HI:0] mod_res;
+`define FAST  // Only for debugging
 
-// TODO: is Verilog guaranteed to translate these into comb. logic?
+reg [2:0] state;
+reg [HI:0] p;
+reg [HI:0] div;
+reg [HI:0] div_squared;
+reg mod_go;
+
 reg [2:0] next_state;
 reg [HI:0] next_p;
 reg [HI:0] next_div;
@@ -36,7 +39,25 @@ reg [HI:0] next_div_squared;
 reg next_mod_go;
 reg [HI:0] next_res;
 
-`define FAST  // Only for debugging
+wire next_ready;
+wire next_error;
+
+wire mod_ready;
+wire mod_error;
+wire [HI:0] mod_res;
+
+divmod #(.WIDTH_LOG(WIDTH_LOG)) d_m(
+  .clk(clk),
+  .go(mod_go),
+  .rst(rst),
+  .a(p),
+  .b(div),
+  .ready(mod_ready),
+  .error(mod_error),
+  .mod(mod_res));
+
+assign next_ready = next_state == READY || next_state == ERROR;
+assign next_error = next_state == ERROR;
 
 always @* begin
   next_state = state;
@@ -146,28 +167,6 @@ always @* begin
 
   endcase
 end
-
-reg [2:0] state;
-reg [HI:0] p;
-reg [HI:0] div;
-reg [HI:0] div_squared;
-reg mod_go;
-
-divmod #(.WIDTH_LOG(WIDTH_LOG)) d_m(
-  .clk(clk),
-  .go(mod_go),
-  .rst(rst),
-  .a(p),
-  .b(div),
-  .ready(mod_ready),
-  .error(mod_error),
-  .mod(mod_res));
-
-wire next_ready;
-assign next_ready = next_state == READY || next_state == ERROR;
-
-wire next_error;
-assign next_error = next_state == ERROR;
 
 always @(posedge clk)
   if (rst) begin

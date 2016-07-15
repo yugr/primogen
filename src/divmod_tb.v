@@ -1,7 +1,6 @@
 module divmod_tb;
 
 reg clk = 0;
-always #5 clk = !clk;
 
 reg go = 0;
 reg rst = 0;
@@ -12,6 +11,9 @@ wire m1_ready;
 wire m1_error;
 wire [15:0] m1_div;
 wire [15:0] m1_mod;
+
+reg [15:0] div;
+reg [15:0] mod;
 
 divmod dm1(
   .clk(clk),
@@ -24,8 +26,7 @@ divmod dm1(
   .div(m1_div),
   .mod(m1_mod));
 
-reg [15:0] div;
-reg [15:0] mod;
+always #5 clk = !clk;
 
 initial begin
 
