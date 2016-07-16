@@ -25,7 +25,7 @@ localparam READY = 2'd0;
 localparam SUBTRACT   = 2'd1;
 localparam ERROR = 2'd2;
 
-reg [3:0] state;
+reg [1:0] state;
 reg [HI:0] sub;
 reg [7:0] shift;
 
@@ -45,7 +45,7 @@ wire [7:0] max_shift;
 prio_enc #(.WIDTH_LOG(WIDTH_LOG)) a_pe(.x(a), .msb(a_msb));
 prio_enc #(.WIDTH_LOG(WIDTH_LOG)) b_pe(.x(b), .msb(b_msb));
 
-assign max_shift = (a_msb > b_msb + 1) ? (a_msb - b_msb - 1) : 0;
+assign max_shift = (a_msb > b_msb + 8'b1) ? (a_msb - b_msb - 8'b1) : 8'b0;
 
 assign next_ready = next_state == READY || next_state == ERROR;
 assign next_error = next_state == ERROR;
@@ -88,7 +88,7 @@ always @* begin
       end else begin
         next_state = READY;
         next_sub = XW;
-        next_shift = XW;
+        next_shift = X7;
       end
 
     default:
