@@ -4,7 +4,7 @@ module prio_enc #(
   parameter WIDTH_LOG = 4
 ) (
   input [(1 << WIDTH_LOG) - 1:0] x,
-  output [7:0] msb
+  output reg [7:0] msb
 );
 
 localparam WIDTH = 1 << WIDTH_LOG;
@@ -15,7 +15,6 @@ localparam WIDTH = 1 << WIDTH_LOG;
 // Slow but simple
 
 integer i;
-reg [7:0] msb;
 
 always @* begin
   msb = 0;
@@ -28,7 +27,6 @@ end
 // is decreasing in size...
 
 integer i, start, width;
-reg [7:0] msb;
 reg [WIDTH - 1:0] part;
 
 always @* begin
