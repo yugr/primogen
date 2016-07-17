@@ -13,19 +13,30 @@ guidelines.
 
 # Run
 
-Currently this only supports simulation and synthesis in Icarus
-Verilog:
+To simulate and synthesize via Icarus, run
 ```
 $ make all
 $ make test
-$ make blif
 ```
-(for synthesis you may need sufficiently new Iverilog...).
+(for synthesis you may need sufficiently new version...).
+
+To generate code for iCEstick, do
+```
+$ cd boards/icestick
+$ make all
+```
+(this will generate bitmap from both Synplify and Lattice synthsizers
+and default backend flow). To simulate via Active-HDL (which comes with
+iCEcube):
+```
+$ make test
+```
 
 # TODO
 
-* port to iCEstick (both Lattice and Yosys toolchains)
-* get code reviewed by professional designer and fix accordingly
+* run on iCEstick
+* port to iCEstick Yosys toolchain
+* get code reviewed by more professional designers and fix accordingly
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))
 * TODOs and FIXMEs in code
 * teach Iverilog to synthesize encoder implemented with recursive functions (?)
