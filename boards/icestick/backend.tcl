@@ -1,7 +1,7 @@
 set device iCE40LP8K-CM225
 set top_module primogen
 set proj_dir [pwd]
-set output_dir "rev_1"
+set output_dir [lindex $argv 0]
 set edif_file "primogen"
 set tool_options ""
 
