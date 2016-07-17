@@ -7,6 +7,10 @@ LSE_OUT = rev_1
 all: $(LSE_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin
 all: $(SYN_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin
 
+test:
+	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
+	$$SIM syn/sim.do
+
 $(LSE_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin: $(LSE_OUT)/primogen.edf
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$TCL ./backend.tcl $(LSE_OUT)
@@ -29,11 +33,8 @@ $(SYN_OUT)/primogen.edf: $(LM_LICENSE_FILE)
 	# Synplify does not know about error codes so check
 	test -f $@
 
-test:
-	$$SIM  # TODO
-
 clean:
-	rm -rf $(SYN_OUT) $(LSE_OUT) *.ve xxx* stdout.log*
+	rm -rf $(SYN_OUT) $(LSE_OUT) ahdl-out/ *.ve xxx* stdout.log*
 
 .ONESHELL:
 
