@@ -1,7 +1,7 @@
 ICE_ROOT = /cygdrive/c/lscc/iCEcube2.2016.02
 LM_LICENSE_FILE = $(ICE_ROOT)/license.dat
 
-SYN_OUT = $(SYN_OUT)
+SYN_OUT = syn/primogen_Implmnt
 LSE_OUT = rev_1
 
 all: $(LSE_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin
