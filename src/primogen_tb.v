@@ -54,6 +54,9 @@ initial begin
     if (!gen_ready) begin
       $display("FAILED -- I=%d, READY=0", i);
       $finish(1);
+    end else if (gen_error) begin
+      $display("FAILED -- I=%d, ERROR=1", i);
+      $finish(1);
     end else if (^gen_res === 1'bx) begin
       $display("FAILED -- I=%d, UNDEF (%d)", i, gen_res);
       $finish(1);

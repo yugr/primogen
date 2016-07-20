@@ -99,7 +99,7 @@ always @* begin
 
     WAIT_MOD_DLY:
       begin
-        // Wait state to allow divmod to latch inputs and set proper ready bit
+        // Wait state to allow divmod to register inputs and update ready bit
         next_state = WAIT_MOD;
         next_mod_go = 0;
       end
@@ -109,7 +109,6 @@ always @* begin
         next_state = ERROR;
       end else if (mod_ready) begin
         // Modulo is ready for inspection
-        next_state = CHECK_DIVS;
         if (mod_res == 0) begin
           // Divisable => abort and try next candidate
 `ifdef FAST
@@ -117,8 +116,13 @@ always @* begin
 `else
           next_p = p + 1;
 `endif
-          next_div = 2;
-          next_div_squared = 4;
+          if (next_p < p) begin  // Overflow
+            next_state = ERROR;
+          end else begin
+            next_state = CHECK_DIVS;
+            next_div = 2;
+            next_div_squared = 4;
+          end
         end else begin
           // Not divisable => try next divisor
 `ifdef FAST
@@ -150,6 +154,13 @@ always @* begin
           next_div_squared = div_squared + (div << 1) + 1;
           next_div = div + 1;
 `endif
+          // Check for overflow
+          if (next_div < div || next_div_squared < div_squared) begin
+            next_state = ERROR;
+            next_div = XW;
+            next_div_squared = XW;
+          end else
+            next_state = CHECK_DIVS;
         end
       end else begin
         // Stay in WAIT_MOD and do nothing
