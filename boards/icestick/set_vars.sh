@@ -8,17 +8,17 @@ if ! test -f $LM_LICENSE_FILE; then
   exit 1
 fi
 
-SYNTH_LSE=$ICE_ROOT/LSE/bin/nt/synthesis.exe
+SYNTH_LSE=$ICE_ROOT/LSE/bin/nt/synthesis
 test -x $LSE_SYNTH
 
-SYNTH_SYN=$ICE_ROOT/sbt_backend/bin/win32/opt/synpwrap/synpwrap.exe
+SYNTH_SYN=$ICE_ROOT/sbt_backend/bin/win32/opt/synpwrap/synpwrap
 test -x $SYN_SYNTH
 
-SIM=$ICE_ROOT/Aldec/Active-HDL/BIN/VSimSA.exe
+SIM=$ICE_ROOT/Aldec/Active-HDL/BIN/VSimSA
 test -x $SIM
 
 # We need any Windows TCL here (Cygwin's TCL will not work)
-TCL=$ICE_ROOT/Aldec/Active-HDL/BIN/tclsh85.exe
+TCL=$ICE_ROOT/Aldec/Active-HDL/BIN/tclsh85
 test -x $TCL
 
 # These variables need to be set for Lattice tools
