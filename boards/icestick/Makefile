@@ -3,6 +3,7 @@ LM_LICENSE_FILE = $(ICE_ROOT)/license.dat
 
 SYN_OUT = syn/primogen_Implmnt
 LSE_OUT = rev_1
+AHDL_OUT = ahdl-out
 
 all: lse syn
 
@@ -37,7 +38,8 @@ $(SYN_OUT)/primogen.edf: $(LM_LICENSE_FILE) syn/primogen_syn.prj
 	test -f $@
 
 clean:
-	rm -rf $(SYN_OUT) $(LSE_OUT) ahdl-out/ *.ve xxx* stdout.log*
+	rm -rf $(SYN_OUT) $(LSE_OUT) $(AHDL_OUT) ahdl
+	rm -f *.ve xxx* stdout.log* *.arearep *.twr *_drc.log *_prim.v
 
 .ONESHELL:
 
