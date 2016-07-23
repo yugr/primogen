@@ -22,7 +22,6 @@ test: test-divmod test-primogen
 
 test-%: bin/%_tb
 	@vvp $<
-	@echo "$@ PASSED"
 
 clean:
 	rm -f bin/*

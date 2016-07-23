@@ -59,6 +59,7 @@ initial begin
       $finish(1);
     end
   end
+  $display("divmod_tb SUCCEEDED");
   $finish;
 end
 

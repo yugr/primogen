@@ -75,6 +75,7 @@ initial begin
   end
 
   $display("Time to compute %d primes: %t", N, $time);
+  $display("primogen_tb SUCCEEDED");
   $finish;
 end
 
