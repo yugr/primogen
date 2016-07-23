@@ -1,9 +1,7 @@
 ICE_ROOT = /cygdrive/c/lscc/iCEcube2.2016.02
 LM_LICENSE_FILE = $(ICE_ROOT)/license.dat
 
-SYN_OUT = syn/primogen_Implmnt
-LSE_OUT = rev_1
-AHDL_OUT = ahdl-out
+DEPS = $(wildcard ../../src/*) src/* syn/*.pcf $(LM_LICENSE_FILE)
 
 all: lse syn
 
@@ -11,34 +9,34 @@ test:
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$SIM syn/sim.do
 
-lse: $(LSE_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin
+lse: lse_out/sbt/outputs/bitmap/top_bitmap.bin
 
-$(LSE_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin: $(LSE_OUT)/primogen.edf
+lse_out/sbt/outputs/bitmap/top_bitmap.bin: lse_out/top.edf
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
-	$$TCL ./backend.tcl $(LSE_OUT)
+	$$TCL ./backend.tcl lse_out
 
-$(LSE_OUT)/primogen.edf: $(LM_LICENSE_FILE) syn/primogen_lse.prj
+lse_out/top.edf: syn/primogen_lse.prj $(DEPS)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
-	$$SYNTH_LSE -f syn/primogen_lse.prj
+	$$SYNTH_LSE -f $<
 	test -f $@
 
-syn: $(SYN_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin
+syn: synp_out/sbt/outputs/bitmap/top_bitmap.bin
 
-$(SYN_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin: $(SYN_OUT)/primogen.edf
+synp_out/sbt/outputs/bitmap/top_bitmap.bin: synp_out/top.edf
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
-	$$TCL ./backend.tcl $(SYN_OUT)
+	$$TCL ./backend.tcl synp_out
 
-$(SYN_OUT)/primogen.edf: $(LM_LICENSE_FILE) syn/primogen_syn.prj
+synp_out/top.edf: syn/primogen_syn.prj $(DEPS)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	rc=0
-	$$SYNTH_SYN -prj syn/primogen_syn.prj || rc=$$?
+	$$SYNTH_SYN -prj $< || rc=$$?
 	cat stdout.log
 	test $$rc=0
 	# Synplify does not know about error codes so check
 	test -f $@
 
 clean:
-	rm -rf $(SYN_OUT) $(LSE_OUT) $(AHDL_OUT) ahdl
+	rm -rf synp_out lse_out ahdl_out ahdl
 	rm -f *.ve xxx* stdout.log* *.arearep *.twr *_drc.log *_prim.v
 
 .ONESHELL:

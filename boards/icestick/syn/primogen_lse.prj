@@ -30,14 +30,15 @@
 -fix_gated_clocks 1
 
 # files
--ver "primogen.v"
--ver "divmod.v"
--ver "prio_enc.v"
--p "../../src"
--top primogen
+-ver "src/primogen.v"
+-ver "src/divmod.v"
+-ver "src/prio_enc.v"
+-ver "boards/icestick/src/top.v"
+-p "../.."
+-top top
 
 # output
--output_edif rev_1/primogen.edf
+-output_edif lse_out/top.edf
 
 #s et log file
--logfile primogen.log
+-logfile top.log

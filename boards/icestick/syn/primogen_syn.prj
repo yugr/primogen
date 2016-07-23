@@ -2,15 +2,16 @@
 add_file -verilog ../../../src/primogen.v
 add_file -verilog ../../../src/divmod.v
 add_file -verilog ../../../src/prio_enc.v
+add_file -verilog ../src/top.v
 #add_file -constraint -lib work "primogen.sdc"
 
 # implementation
-impl -add primogen_Implmnt -type fpga
+impl -add myimpl -type fpga
 
 # implementation attributes
 set_option -vlog_std v2001
 set_option -project_relative_includes 1
-set_option -top_module primogen
+set_option -top_module top
 
 # device
 set_option -technology SBTiCE40
@@ -50,7 +51,7 @@ set_option -write_apr_constraint 1
 
 # set result format/file last
 project -result_format "edif"
-project -result_file "./primogen_Implmnt/primogen.edf"
-project -log_file "./primogen_Implmnt/primogen.srr"
-impl -active primogen_Implmnt
+project -result_file "../synp_out/top.edf"
+project -log_file "../synp_out/top.srr"
+impl -active myimpl
 project -run synthesis -clean

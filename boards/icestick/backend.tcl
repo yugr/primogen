@@ -1,8 +1,8 @@
 set device iCE40LP8K-CM225
-set top_module primogen
+set top_module top
 set proj_dir [pwd]
 set output_dir [lindex $argv 0]
-set edif_file "primogen"
+set edif_file "top"
 set tool_options ""
 
 set sbt_root $::env(SBT_DIR)
