@@ -15,7 +15,7 @@ $(LSE_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin: $(LSE_OUT)/primogen.edf
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$TCL ./backend.tcl $(LSE_OUT)
 
-$(LSE_OUT)/primogen.edf: $(LM_LICENSE_FILE)
+$(LSE_OUT)/primogen.edf: $(LM_LICENSE_FILE) syn/primogen_lse.prj
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$SYNTH_LSE -f syn/primogen_lse.prj
 	test -f $@
@@ -24,7 +24,7 @@ $(SYN_OUT)/sbt/outputs/bitmap/primogen_bitmap.bin: $(SYN_OUT)/primogen.edf
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$TCL ./backend.tcl $(SYN_OUT)
 
-$(SYN_OUT)/primogen.edf: $(LM_LICENSE_FILE)
+$(SYN_OUT)/primogen.edf: $(LM_LICENSE_FILE) syn/primogen_syn.prj
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	rc=0
 	$$SYNTH_SYN -prj syn/primogen_syn.prj || rc=$$?
