@@ -3,7 +3,7 @@ LM_LICENSE_FILE = $(ICE_ROOT)/license.dat
 
 DEPS = $(wildcard ../../src/*) src/* syn/*.pcf $(LM_LICENSE_FILE)
 
-all: lse syn
+all: lse synp
 
 test:
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
@@ -18,9 +18,10 @@ lse_out/sbt/outputs/bitmap/top_bitmap.bin: lse_out/top.edf
 lse_out/top.edf: syn/primogen_lse.prj $(DEPS)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$SYNTH_LSE -f $<
+	mv .vdbs* *.v.ve *_prim.v *.arearep xxx_lse_* *.log *.twr lse_out
 	test -f $@
 
-syn: synp_out/sbt/outputs/bitmap/top_bitmap.bin
+synp: synp_out/sbt/outputs/bitmap/top_bitmap.bin
 
 synp_out/sbt/outputs/bitmap/top_bitmap.bin: synp_out/top.edf
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
@@ -36,10 +37,9 @@ synp_out/top.edf: syn/primogen_syn.prj $(DEPS)
 	test -f $@
 
 clean:
-	rm -rf synp_out lse_out ahdl_out ahdl
-	rm -f *.ve xxx* stdout.log* *.arearep *.twr *_drc.log *_prim.v
+	rm -rf synp_out lse_out ahdl_out
 
 .ONESHELL:
 
-.PHONY: all clean test lse syn
+.PHONY: all clean test lse synp
 

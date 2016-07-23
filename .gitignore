@@ -1,4 +1,7 @@
 bin/*
 *swp
-*.ve
-.vdbs
+lse_out
+synp_out
+ahdl_out
+synlog.tcl
+library.cfg
