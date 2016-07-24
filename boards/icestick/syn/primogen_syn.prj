@@ -51,7 +51,7 @@ set_option -write_apr_constraint 1
 
 # set result format/file last
 project -result_format "edif"
-project -result_file "../synp_out/top.edf"
-project -log_file "../synp_out/top.srr"
+project -result_file "../bin/top.edf"
+project -log_file "../bin/top.srr"
 impl -active myimpl
 project -run synthesis -clean

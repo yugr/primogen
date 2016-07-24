@@ -11,6 +11,7 @@ module top (
 
   // TODO: not sure it's universally synthesizable...
   reg rst = 1;
+  reg [3:0] rst_count = 4'd15;
 
   localparam HI = 15;
 
@@ -32,7 +33,6 @@ module top (
 
   always @(posedge clk) begin
     if (rst) begin
-      rst <= 0;
       clk_sec <= 1;
       clk_count <= 0;
     end else begin
@@ -59,12 +59,20 @@ module top (
     end
   end
 
+  always @(posedge clk) begin
+    if (rst_count == 4'd15)
+      rst <= 0;
+    else begin
+      rst_count = rst_count + 1;
+    end
+  end
+
   // Dummy
 
   reg [4:0] count;
 
   always @(posedge clk_sec) begin
-    count <= count + 24'b1;
+    count <= count + 5'b1;
   end
 
   assign LED1 = count[0];

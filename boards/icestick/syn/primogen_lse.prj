@@ -38,7 +38,7 @@
 -top top
 
 # output
--output_edif lse_out/top.edf
+-output_edif bin/top.edf
 
 #s et log file
 -logfile top.log

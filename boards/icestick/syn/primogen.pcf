@@ -2,8 +2,11 @@
 
 set_io clk 21
 
+# Red LEDs
 set_io LED1 99
 set_io LED2 98
 set_io LED3 97
-set_io LED4 96
 set_io LED5 95
+
+# Green LED
+set_io LED4 96

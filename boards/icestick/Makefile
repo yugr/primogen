@@ -1,45 +1,47 @@
+$(shell mkdir -p bin)
+
+# These may need to be changed for your environment
 ICE_ROOT = /cygdrive/c/lscc/iCEcube2.2016.02
 LM_LICENSE_FILE = $(ICE_ROOT)/license.dat
 
-DEPS = $(wildcard ../../src/*) src/* syn/*.pcf $(LM_LICENSE_FILE)
+# Use Lattice tools by default
+LSE_OR_SYNP = 1
 
-all: lse synp
+BITMAP = bin/sbt/outputs/bitmap/top_bitmap.bin
 
-test:
+all: $(BITMAP)
+
+test: $(LM_LICENSE_FILE)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$SIM syn/sim.do
 
-lse: lse_out/sbt/outputs/bitmap/top_bitmap.bin
-
-lse_out/sbt/outputs/bitmap/top_bitmap.bin: lse_out/top.edf
+flash: syn/primogen.xcf $(BITMAP) $(LM_LICENSE_FILE)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
-	$$TCL ./backend.tcl lse_out
+	$$PROG -infile $< -logfile bin/flash.log
 
-lse_out/top.edf: syn/primogen_lse.prj $(DEPS)
+$(BITMAP): bin/top.edf syn/primogen.pcf $(LM_LICENSE_FILE)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
-	$$SYNTH_LSE -f $<
-	mv .vdbs* *.v.ve *_prim.v *.arearep xxx_lse_* *.log *.twr lse_out
-	test -f $@
+	$$TCL ./backend.tcl bin
 
-synp: synp_out/sbt/outputs/bitmap/top_bitmap.bin
-
-synp_out/sbt/outputs/bitmap/top_bitmap.bin: synp_out/top.edf
+bin/top.edf: ../../src/* src/* syn/* $(LM_LICENSE_FILE)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
-	$$TCL ./backend.tcl synp_out
-
-synp_out/top.edf: syn/primogen_syn.prj $(DEPS)
-	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
+ifeq ($(LSE_OR_SYNP), 0)
 	rc=0
-	$$SYNTH_SYN -prj $< || rc=$$?
+	$$SYNTH_SYN -prj syn/primogen_synp.prj || rc=$$?
 	cat stdout.log
 	test $$rc=0
+else
+	$$SYNTH_LSE -f syn/primogen_lse.prj
+	# Move all the generated trash to output dir
+	mv .vdbs* *.v.ve *_prim.v *.arearep xxx_lse_* *.log *.twr bin
+endif
 	# Synplify does not know about error codes so check
 	test -f $@
 
 clean:
-	rm -rf synp_out lse_out ahdl_out
+	rm -rf bin
 
 .ONESHELL:
 
-.PHONY: all clean test lse synp
+.PHONY: all clean test flash
 

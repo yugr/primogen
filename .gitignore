@@ -1,7 +1,5 @@
 bin/*
+boards/icestick/bin/*
 *swp
-lse_out
-synp_out
-ahdl_out
 synlog.tcl
 library.cfg

@@ -17,6 +17,8 @@ test -x $SYN_SYNTH
 SIM=$ICE_ROOT/Aldec/Active-HDL/BIN/VSimSA
 test -x $SIM
 
+PROG=$ICE_ROOT/../Programmer/3.7_x64/bin/nt64/pgrcmd
+
 # We need any Windows TCL here (Cygwin's TCL will not work)
 TCL=$ICE_ROOT/Aldec/Active-HDL/BIN/tclsh85
 test -x $TCL
