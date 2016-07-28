@@ -32,7 +32,6 @@ To flash generated bitmap to device, do
 ```
 $ make flash
 ```
-I haven't been able to get this to work for my board though.
 
 To simulate via Active-HDL (which comes with iCEcube):
 ```
