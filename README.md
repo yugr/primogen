@@ -32,6 +32,8 @@ To flash generated bitmap to device, do
 ```
 $ make flash
 ```
+The bitmap will output 5 LSBs of generated primes to board LEDs
+every 5 seconds.
 
 To simulate via Active-HDL (which comes with iCEcube):
 ```
@@ -40,7 +42,6 @@ $ make test
 
 # TODO
 
-* run on iCEstick
 * port to iCEstick Yosys toolchain
 * get code reviewed by more professional designers and fix accordingly
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))

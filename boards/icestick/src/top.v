@@ -6,10 +6,11 @@ module top (
   output LED4,
   output LED5);
 
-  reg [23:0] clk_count;
-  reg clk_sec;
+  reg [27:0] clk_count;
+  reg pulse_5_sec;
 
-  // TODO: not sure it's universally synthesizable...
+  // Not sure it's universally synthesizable
+  // but ok for FPGA.
   reg rst = 1;
   reg [3:0] rst_count = 4'd15;
 
@@ -29,17 +30,18 @@ module top (
     .res(res));
 
   // clk is 12 MHz
-  localparam DIV = 24'd12000000 / 2;
+  localparam DIV = 28'd12000000 * 28'd5;
 
   always @(posedge clk) begin
     if (rst) begin
-      clk_sec <= 1;
+      pulse_5_sec <= 0;
       clk_count <= 0;
     end else begin
       if (clk_count == DIV) begin
-        clk_sec <= ~clk_sec;
+        pulse_5_sec <= 1;
         clk_count <= 24'd0;
       end else begin
+        pulse_5_sec <= 0;
         clk_count <= clk_count + 24'd1;
       end
     end
@@ -52,7 +54,7 @@ module top (
     end else begin
       go <= 0;
       // !go - give primogen 1 clock to register inputs
-      if (rdy && !go) begin
+      if (rdy && !error && !go && pulse_5_sec) begin
         go <= 1;
         prime <= res;
       end
@@ -67,18 +69,10 @@ module top (
     end
   end
 
-  // Dummy
-
-  reg [4:0] count;
-
-  always @(posedge clk_sec) begin
-    count <= count + 5'b1;
-  end
-
-  assign LED1 = count[0];
-  assign LED2 = count[1];
-  assign LED3 = count[2];
-  assign LED4 = count[3];
-  assign LED5 = count[4];
+  assign LED1 = prime[0];
+  assign LED2 = prime[1];
+  assign LED3 = prime[2];
+  assign LED4 = prime[3];
+  assign LED5 = prime[4];
 
 endmodule
