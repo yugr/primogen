@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+test $# = 2
+
 ICE_ROOT=$1
 LM_LICENSE_FILE=$2
 

@@ -7,41 +7,55 @@ LM_LICENSE_FILE = $(ICE_ROOT)/license.dat
 # Use Lattice tools by default
 LSE_OR_SYNP = 1
 
-BITMAP = bin/sbt/outputs/bitmap/blink_bitmap.bin
+BLINK = bin/sbt/outputs/bitmap/blink_bitmap.bin
+BENCH = bin/sbt/outputs/bitmap/bench_bitmap.bin
 
-all: $(BITMAP)
+all: $(BLINK) $(BENCH)
 
-test: $(LM_LICENSE_FILE)
+test:
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$SIM syn/sim.do
 
-flash: syn/flash.xcf $(BITMAP) $(LM_LICENSE_FILE)
+flash-%: syn/%_flash.xcf bin/sbt/outputs/bitmap/%_bitmap.bin
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
-	$$PROG -infile $< -logfile bin/flash.log
+	$$PROG -infile $< -logfile bin/$@.log
 
-$(BITMAP): bin/blink.edf syn/icestick.pcf $(LM_LICENSE_FILE)
-	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
-	$$TCL ./backend.tcl bin
+bitmap-%: bin/sbt/outputs/bitmap/%_bitmap.bin
 
-bin/blink.edf: ../../src/* src/* syn/* $(LM_LICENSE_FILE)
+bin/sbt/outputs/bitmap/%_bitmap.bin: bin/%.edf syn/icestick.pcf backend.tcl
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
+	$$TCL ./backend.tcl $*
+
 ifeq ($(LSE_OR_SYNP), 0)
+bin/%.edf: syn/%_synp.prj src/%.v ../../src/*
+	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
+	rm -f $@
 	rc=0
-	$$SYNTH_SYN -prj syn/synp.prj || rc=$$?
+	$$SYNTH_SYN -prj $< || rc=$$?
 	cat stdout.log
 	test $$rc=0
-else
-	$$SYNTH_LSE -f syn/lse.prj
-	# Move all the generated trash to output dir
-	mv .vdbs* *.v.ve *_prim.v *.arearep xxx_lse_* *.log *.twr bin
-endif
 	# Synplify does not know about error codes so check
 	test -f $@
+else
+bin/%.edf: syn/%_lse.prj src/%.v ../../src/*
+	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
+	rm -f $@
+	$$SYNTH_LSE -f $<
+	# Move all the generated trash to output dir
+	mv .vdbs* *.v.ve *_prim.v *.arearep xxx_lse_* *.log *.twr bin
+	# Synplify does not know about error codes so check
+	test -f $@
+endif
 
 clean:
 	rm -rf bin
 
 .ONESHELL:
 
-.PHONY: all clean test flash
+.PRECIOUS: bin/%.edf bin/sbt/outputs/bitmap/%_bitmap.bin
+
+.PHONY: all clean test
+
+# Can't do this as it disables pattern rules above...
+#.PHONY: flash-blink flash-bench bitmap-blink flash-bench
 
