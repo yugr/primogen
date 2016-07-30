@@ -71,7 +71,6 @@ always @* begin
     READY, ERROR:
       if (go) begin
         // Search for next prime
-        next_state = CHECK_DIVS;
 `ifdef FAST
         case (res)
           1: next_p = 8'd2;
@@ -81,8 +80,13 @@ always @* begin
 `else
         next_p = res + 8'd1;
 `endif
-        next_div = 8'd2;
-        next_div_squared = 8'd4;
+        if (next_p < res) begin  // Overflow
+          next_state = ERROR;
+        end else begin
+          next_state = CHECK_DIVS;
+          next_div = 8'd2;
+          next_div_squared = 8'd4;
+        end
       end else begin
         // Stay in READY and do nothing
       end
