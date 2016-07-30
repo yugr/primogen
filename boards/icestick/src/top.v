@@ -34,15 +34,16 @@ module top (
 
   always @(posedge clk) begin
     if (rst) begin
+
       pulse_5_sec <= 0;
       clk_count <= 0;
     end else begin
       if (clk_count == DIV) begin
         pulse_5_sec <= 1;
-        clk_count <= 24'd0;
+        clk_count <= 1'd0;
       end else begin
         pulse_5_sec <= 0;
-        clk_count <= clk_count + 24'd1;
+        clk_count <= clk_count + 1'd1;
       end
     end
   end
@@ -54,7 +55,7 @@ module top (
     end else begin
       go <= 0;
       // !go - give primogen 1 clock to register inputs
-      if (rdy && !error && !go && pulse_5_sec) begin
+      if (rdy && !err && !go && pulse_5_sec) begin
         go <= 1;
         prime <= res;
       end
@@ -65,7 +66,7 @@ module top (
     if (rst_count == 4'd15)
       rst <= 0;
     else begin
-      rst_count = rst_count + 1;
+      rst_count = rst_count + 1'd1;
     end
   end
 

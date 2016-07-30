@@ -79,12 +79,12 @@ always @* begin
 
     SUBTRACT:
       if (sub <= mod) begin
-        next_div = div + (1 << shift);
+        next_div = div + (1'd1 << shift);
         next_mod = mod - sub;
       end else if (shift > 0) begin  // sub > mod
         // TODO: we can do faster than that by immediately shifting to next msb of A
-        next_sub = sub >> 1;
-        next_shift = shift - 1;
+        next_sub = sub >> 1'd1;
+        next_shift = shift - 1'd1;
       end else begin
         next_state = READY;
         next_sub = XW;

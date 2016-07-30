@@ -74,15 +74,15 @@ always @* begin
         next_state = CHECK_DIVS;
 `ifdef FAST
         case (res)
-          1: next_p = 2;
-          2: next_p = 3;
-          default: next_p = res + 2;
+          1: next_p = 8'd2;
+          2: next_p = 8'd3;
+          default: next_p = res + 8'd2;
         endcase
 `else
-        next_p = res + 1;
+        next_p = res + 8'd1;
 `endif
-        next_div = 2;
-        next_div_squared = 4;
+        next_div = 8'd2;
+        next_div_squared = 8'd4;
       end else begin
         // Stay in READY and do nothing
       end
@@ -112,16 +112,16 @@ always @* begin
         if (mod_res == 0) begin
           // Divisable => abort and try next candidate
 `ifdef FAST
-          next_p = p + 2;
+          next_p = p + 8'd2;
 `else
-          next_p = p + 1;
+          next_p = p + 8'd1;
 `endif
           if (next_p < p) begin  // Overflow
             next_state = ERROR;
           end else begin
             next_state = CHECK_DIVS;
-            next_div = 2;
-            next_div_squared = 4;
+            next_div = 8'd2;
+            next_div_squared = 8'd4;
           end
         end else begin
           // Not divisable => try next divisor
@@ -130,29 +130,29 @@ always @* begin
           case (div)
             2:
               begin
-                next_div = 3;
-                next_div_squared = 9;
+                next_div = 8'd3;
+                next_div_squared = 8'd9;
               end
             7:
               begin
-                next_div = 11;
-                next_div_squared = 121;
+                next_div = 8'd11;
+                next_div_squared = 8'd121;
               end
             13:
               begin
-                next_div = 17;
-                next_div_squared = 289;
+                next_div = 8'd17;
+                next_div_squared = 9'd289;
               end
             // 3, 5, 11 and 17 covered in default branch
             default:
               begin
-                next_div = div + 2;
-                next_div_squared = div_squared + (div << 2) + 4;
+                next_div = div + 8'd2;
+                next_div_squared = div_squared + (div << 2) + 8'd4;
               end
           endcase
 `else
-          next_div_squared = div_squared + (div << 1) + 1;
-          next_div = div + 1;
+          next_div_squared = div_squared + (div << 1) + 8'd1;
+          next_div = div + 8'd1;
 `endif
           // Check for overflow
           if (next_div < div || next_div_squared < div_squared) begin

@@ -40,7 +40,7 @@ always @* begin
       start = start + width;
       part = part >> width;
     end
-    part = part & ((1 << width) - 1);
+    part = part & ((1'd1 << width) - 1'd1);
   end
   `assert(width, 1)
   msb = start;
