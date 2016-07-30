@@ -77,6 +77,6 @@ module blink (
   assign LED2 = prime[1];
   assign LED3 = prime[2];
   assign LED4 = prime[3];
-  assign LED5 = prime[4];
+  assign LED5 = err;
 
 endmodule
