@@ -1,8 +1,8 @@
 set device iCE40HX1K-TQ144
-set top_module top
+set top_module blink
 set proj_dir [pwd]
 set output_dir [lindex $argv 0]
-set edif_file "top"
+set edif_file "blink"
 set tool_options ":edifparser --physicalconstraint syn/icestick.pcf"
 
 set sbt_root $::env(SBT_DIR)

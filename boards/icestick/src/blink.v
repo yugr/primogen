@@ -1,4 +1,7 @@
-module top (
+// This computes new prime every 5 seconds
+// and displays lower 5 bits via LEDs.
+
+module blink (
   input clk,
   output LED1,
   output LED2,

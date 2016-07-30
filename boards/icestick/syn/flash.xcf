@@ -17,7 +17,7 @@
 				<BScanLen>1</BScanLen>
 				<BScanVal>0</BScanVal>
 			</Bypass>
-			<File>bin/sbt/outputs/bitmap/top_bitmap.bin</File>
+			<File>bin/sbt/outputs/bitmap/blink_bitmap.bin</File>
 			<Operation>SPI Flash Erase,Program,Verify</Operation>
 			<Option>
 				<SVFVendor>JTAG STANDARD</SVFVendor>
@@ -57,7 +57,7 @@
 					<IDCode>0x16</IDCode>
 					<Package>8-pin VDFPN8</Package>
 					<Operation>SPI Flash Erase,Program,Verify</Operation>
-					<File>bin/sbt/outputs/bitmap/top_bitmap.bin</File>
+					<File>bin/sbt/outputs/bitmap/blink_bitmap.bin</File>
 					<AddressBase>0x00000000</AddressBase>
 					<EndAddress>0x00010000</EndAddress>
 					<DeviceSize>32</DeviceSize>
@@ -70,11 +70,11 @@
 				<Device>
 					<Pos>1</Pos>
 					<Name></Name>
-					<File>bin/sbt/outputs/bitmap/top_bitmap.bin</File>
+					<File>bin/sbt/outputs/bitmap/blink_bitmap.bin</File>
 					<LocalChainList>
 						<LocalDevice index="-99"
 							name="Unknown"
-							file="bin/sbt/outputs/bitmap/top_bitmap.bin"/>
+							file="bin/sbt/outputs/bitmap/blink_bitmap.bin"/>
 					</LocalChainList>
 					<Option>
 						<SVFVendor>JTAG STANDARD</SVFVendor>

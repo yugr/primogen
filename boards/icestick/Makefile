@@ -7,7 +7,7 @@ LM_LICENSE_FILE = $(ICE_ROOT)/license.dat
 # Use Lattice tools by default
 LSE_OR_SYNP = 1
 
-BITMAP = bin/sbt/outputs/bitmap/top_bitmap.bin
+BITMAP = bin/sbt/outputs/bitmap/blink_bitmap.bin
 
 all: $(BITMAP)
 
@@ -19,11 +19,11 @@ flash: syn/flash.xcf $(BITMAP) $(LM_LICENSE_FILE)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$PROG -infile $< -logfile bin/flash.log
 
-$(BITMAP): bin/top.edf syn/icestick.pcf $(LM_LICENSE_FILE)
+$(BITMAP): bin/blink.edf syn/icestick.pcf $(LM_LICENSE_FILE)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 	$$TCL ./backend.tcl bin
 
-bin/top.edf: ../../src/* src/* syn/* $(LM_LICENSE_FILE)
+bin/blink.edf: ../../src/* src/* syn/* $(LM_LICENSE_FILE)
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
 ifeq ($(LSE_OR_SYNP), 0)
 	rc=0
