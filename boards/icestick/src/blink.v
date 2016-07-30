@@ -17,14 +17,17 @@ module blink (
   reg rst = 1;
   reg [3:0] rst_count = 4'd15;
 
-  localparam HI = 15;
+  // WLOG=5 (i.e. 32-bit primes) takes a LOT more time to build...
+  localparam WLOG = 4;
+  localparam W = 1 << WLOG;
+  localparam HI = W - 1;
 
   reg go;
   wire rdy, err;
   wire [HI:0] res;
   reg [HI:0] prime;
 
-  primogen pg(
+  primogen #(.WIDTH_LOG(WLOG)) pg(
     .clk(clk),
     .go(go),
     .rst(rst),

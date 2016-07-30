@@ -15,14 +15,16 @@ module bench (
   reg rst = 1;
   reg [3:0] rst_count = 4'd15;
 
-  localparam W = 16;
+  // WLOG=5 (i.e. 32-bit primes) takes a LOT more time to build...
+  localparam WLOG = 4;
+  localparam W = 1 << WLOG;
   localparam HI = W - 1;
 
   reg go;
   wire rdy, err;
   wire [HI:0] res;
 
-  primogen pg(
+  primogen #(.WIDTH_LOG(WLOG)) pg(
     .clk(clk),
     .go(go),
     .rst(rst),
@@ -50,7 +52,7 @@ module bench (
     end
   end
 
-  localparam CHUNK = 16'd1 << (W - 2);
+  localparam CHUNK = 32'd1 << (W - 2);
 
   // Show progress
   assign LED1 = res > 0;
