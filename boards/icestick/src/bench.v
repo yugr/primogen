@@ -19,10 +19,17 @@ module bench (
   localparam WLOG = 4;
   localparam W = 1 << WLOG;
   localparam HI = W - 1;
+  localparam MAX = {W{1'd1}};
+
+  localparam LED_STEP_1 = MAX / 5'd16;
+  localparam LED_STEP = LED_STEP_1 + (LED_STEP_1 * 5'd16 < MAX ? 1 : 0);
+  reg [3:0] leds;
+  reg [HI:0] leds_num;
 
   reg go;
   wire rdy, err;
   wire [HI:0] res;
+  reg [HI:0] prime;
 
   primogen #(.WIDTH_LOG(WLOG)) pg(
     .clk(clk),
@@ -40,10 +47,12 @@ module bench (
       // !go - give primogen 1 clock to register inputs
       if (rdy && !err && !go) begin
         go <= 1;
+        prime <= res;
       end
     end
   end
 
+  // Initial reset
   always @(posedge clk) begin
     if (rst_count == 4'd15)
       rst <= 0;
@@ -52,15 +61,26 @@ module bench (
     end
   end
 
-  localparam CHUNK = 32'd1 << (W - 2);
-
-  // Show progress
-  assign LED1 = res > 0;
-  assign LED2 = res >= 2'd1 * CHUNK;
-  assign LED3 = res >= 2'd2 * CHUNK;
-  assign LED4 = res >= 2'd3 * CHUNK;
-
   // This will be lit on overflow
   assign LED5 = err;
+
+  // Show progress
+
+  always @(posedge clk) begin
+    if (rst) begin
+      leds <= 0;
+      leds_num <= 0;
+    end else begin
+      if (prime > leds_num) begin
+        leds <= leds + 1'd1;
+        leds_num <= leds_num + LED_STEP;
+      end
+    end
+  end
+
+  assign LED1 = leds[0];
+  assign LED2 = leds[1];
+  assign LED3 = leds[2];
+  assign LED4 = leds[3];
 
 endmodule

@@ -24,6 +24,7 @@ bitmap-%: bin/sbt/outputs/bitmap/%_bitmap.bin
 
 bin/sbt/outputs/bitmap/%_bitmap.bin: bin/%.edf syn/icestick.pcf backend.tcl
 	. ./set_vars.sh $(ICE_ROOT) $(LM_LICENSE_FILE)
+	rm -f $@
 	$$TCL ./backend.tcl $*
 
 ifeq ($(LSE_OR_SYNP), 0)
