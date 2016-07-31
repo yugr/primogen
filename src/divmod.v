@@ -11,8 +11,8 @@ module divmod #(
   input [(1 << WIDTH_LOG) - 1:0] b,
   output reg ready,
   output reg error,
-  output reg [(1 << WIDTH_LOG) - 1:0] div,
-  output reg [(1 << WIDTH_LOG) - 1:0] mod
+  output reg [(1 << WIDTH_LOG) - 1:0] rem,
+  output reg [(1 << WIDTH_LOG) - 1:0] quot
 );
 
 localparam WIDTH = 1 << WIDTH_LOG;
@@ -32,8 +32,8 @@ reg [7:0] shift;
 reg [1:0] next_state;
 reg [HI:0] next_sub;
 reg [7:0] next_shift;
-reg [HI:0] next_div;
-reg [HI:0] next_mod;
+reg [HI:0] next_rem;
+reg [HI:0] next_quot;
 
 wire next_ready;
 wire next_error;
@@ -54,8 +54,8 @@ always @* begin
   next_state = state;
   next_sub = sub;
   next_shift = shift;
-  next_div = div;
-  next_mod = mod;
+  next_rem = rem;
+  next_quot = quot;
 
   case (state)
     READY, ERROR:
@@ -64,24 +64,24 @@ always @* begin
           next_state = ERROR;
           next_sub = XW;
           next_shift = X7;
-          next_div = XW;
-          next_mod = XW;
+          next_rem = XW;
+          next_quot = XW;
         end else begin
           next_state = SUBTRACT;
           next_sub = b << max_shift;
           next_shift = max_shift;
-          next_div = 0;
-          next_mod = a;
+          next_rem = 0;
+          next_quot = a;
         end
       end else begin
         // Stay in READY and do nothing
       end
 
     SUBTRACT:
-      if (sub <= mod) begin
-        next_div = div + (1'd1 << shift);
-        next_mod = mod - sub;
-      end else if (shift > 0) begin  // sub > mod
+      if (sub <= quot) begin
+        next_rem = rem + (1'd1 << shift);
+        next_quot = quot - sub;
+      end else if (shift > 0) begin  // sub > quot
         // TODO: we can do faster than that by immediately shifting to next msb of A
         next_sub = sub >> 1'd1;
         next_shift = shift - 1'd1;
@@ -96,8 +96,8 @@ always @* begin
         next_state = 2'bx;
         next_sub = XW;
         next_shift = X7;
-        next_div = XW;
-        next_mod = XW;
+        next_rem = XW;
+        next_quot = XW;
       end
 
   endcase
@@ -110,22 +110,22 @@ always @(posedge clk)
     state <= READY;
     sub <= XW;
     shift <= X7;
-    mod <= XW;
-    div <= XW;
+    quot <= XW;
+    rem <= XW;
     ready <= 1;
     error <= 0;
   end else begin
     state <= next_state;
     sub <= next_sub;
     shift <= next_shift;
-    mod <= next_mod;
-    div <= next_div;
+    quot <= next_quot;
+    rem <= next_rem;
     ready <= next_ready;
     error <= next_error;
   end
 
 //  initial
-//    $monitor("%t: go=%b, a=%h, b=%h, mod=%h, state=%h, a_msb=%h, b_msb=%h, sub=%h, shift=%h, ready=%b", $time, go, a, b, mod, state, a_msb, b_msb, sub, shift, ready);
+//    $monitor("%t: go=%b, a=%h, b=%h, quot=%h, state=%h, a_msb=%h, b_msb=%h, sub=%h, shift=%h, ready=%b", $time, go, a, b, quot, state, a_msb, b_msb, sub, shift, ready);
 
 endmodule
 

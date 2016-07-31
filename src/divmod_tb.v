@@ -12,8 +12,8 @@ wire m1_error;
 wire [15:0] m1_div;
 wire [15:0] m1_mod;
 
-reg [15:0] div;
-reg [15:0] mod;
+reg [15:0] rem;
+reg [15:0] quot;
 
 divmod dm1(
   .clk(clk),
@@ -23,8 +23,8 @@ divmod dm1(
   .b(b),
   .ready(m1_ready),
   .error(m1_error),
-  .div(m1_div),
-  .mod(m1_mod));
+  .rem(m1_div),
+  .quot(m1_mod));
 
 always #5 clk = !clk;
 
@@ -43,19 +43,19 @@ initial begin
     @(posedge clk);
     @(negedge clk) go = 0;
     #100;
-    div = a / b;
-    mod = a % b;
+    rem = a / b;
+    quot = a % b;
     if (!m1_ready) begin
       $display("FAILED -- A=%d, B=%d, READY=0", a, b);
       $finish(1);
     end else if (b != 0 && (^m1_div === 1'bx || ^m1_mod === 1'bx)) begin
       $display("FAILED -- A=%d, B=%d, UNDEF (%d %d)", a, b, m1_div, m1_mod);
       $finish(1);
-    end else if (div != m1_div) begin
-      $display("FAILED -- A=%d, B=%d, DIV=%d (should be %d)", a, b, m1_div, div);
+    end else if (rem != m1_div) begin
+      $display("FAILED -- A=%d, B=%d, DIV=%d (should be %d)", a, b, m1_div, rem);
       $finish(1);
-    end else if (mod != m1_mod) begin
-      $display("FAILED -- A=%d, B=%d, MOD=%d (should be %d)", a, b, m1_mod, mod);
+    end else if (quot != m1_mod) begin
+      $display("FAILED -- A=%d, B=%d, MOD=%d (should be %d)", a, b, m1_mod, quot);
       $finish(1);
     end
   end
@@ -64,6 +64,6 @@ initial begin
 end
 
 //  initial
-//    $monitor("%t: go=%b, ready=%b, error=%b, div=%h, mod=%h", $time, go, m1_ready, m1_error, m1_div, m1_mod);
+//    $monitor("%t: go=%b, ready=%b, error=%b, rem=%h, quot=%h", $time, go, m1_ready, m1_error, m1_div, m1_mod);
 
 endmodule

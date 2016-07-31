@@ -28,7 +28,7 @@ localparam WAIT_MOD = 3'd4;
 
 reg [2:0] state;
 reg [HI:0] p;
-reg [HI:0] div;
+reg [HI:0] rem;
 reg [HI:0] div_squared;
 reg mod_go;
 
@@ -51,10 +51,10 @@ divmod #(.WIDTH_LOG(WIDTH_LOG)) d_m(
   .go(mod_go),
   .rst(rst),
   .a(p),
-  .b(div),
+  .b(rem),
   .ready(mod_ready),
   .error(mod_error),
-  .mod(mod_res));
+  .quot(mod_res));
 
 assign next_ready = next_state == READY || next_state == ERROR;
 assign next_error = next_state == ERROR;
@@ -62,7 +62,7 @@ assign next_error = next_state == ERROR;
 always @* begin
   next_state = state;
   next_p = p;
-  next_div = div;
+  next_div = rem;
   next_div_squared = div_squared;
   next_res = res;
   next_mod_go = mod_go;
@@ -131,7 +131,7 @@ always @* begin
           // Not divisable => try next divisor
 `ifdef FAST
           // Optimize for most common divisors
-          case (div)
+          case (rem)
             2:
               begin
                 next_div = 8'd3;
@@ -150,16 +150,16 @@ always @* begin
             // 3, 5, 11 and 17 covered in default branch
             default:
               begin
-                next_div = div + 8'd2;
-                next_div_squared = div_squared + (div << 2) + 8'd4;
+                next_div = rem + 8'd2;
+                next_div_squared = div_squared + (rem << 2) + 8'd4;
               end
           endcase
 `else
-          next_div_squared = div_squared + (div << 1) + 8'd1;
-          next_div = div + 8'd1;
+          next_div_squared = div_squared + (rem << 1) + 8'd1;
+          next_div = rem + 8'd1;
 `endif
           // Check for overflow
-          if (next_div < div || next_div_squared < div_squared) begin
+          if (next_div < rem || next_div_squared < div_squared) begin
             next_state = ERROR;
             next_div = XW;
             next_div_squared = XW;
@@ -188,7 +188,7 @@ always @(posedge clk)
     // Start by outputting the very first prime...
     state <= READY;
     p <= XW;
-    div <= XW;
+    rem <= XW;
     div_squared <= XW;
     mod_go <= 0;
     ready <= 1;
@@ -197,7 +197,7 @@ always @(posedge clk)
   end else begin
     state <= next_state;
     p <= next_p;
-    div <= next_div;
+    rem <= next_div;
     div_squared <= next_div_squared;
     mod_go <= next_mod_go;
     ready <= next_ready;
@@ -206,7 +206,7 @@ always @(posedge clk)
   end
 
 //  initial
-//    $monitor("%t: rst=%b, go=%b, res=%h, state=%h, p=%h, div=%h, div_squared=%h, mod_error=%b, mod_go=%b, mod_res=%h, mod_ready=%b", $time, rst, go, res, state, p, div, div_squared, mod_error, mod_go, mod_res, mod_ready);
+//    $monitor("%t: rst=%b, go=%b, res=%h, state=%h, p=%h, rem=%h, div_squared=%h, mod_error=%b, mod_go=%b, mod_res=%h, mod_ready=%b", $time, rst, go, res, state, p, rem, div_squared, mod_error, mod_go, mod_res, mod_ready);
 
 endmodule
 
