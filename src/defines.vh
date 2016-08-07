@@ -3,11 +3,11 @@
 `define unreachable ;
 `define mark ;
 `else
-`define assert(sig, val)                              \
-  if (sig !== val)                                    \
-    begin                                             \
-      $display("ASSERTION FAILED in %m: sig != val"); \
-      $finish(1);                                     \
+`define assert(sig, val)                                \
+  if ((sig) !== val)                                    \
+    begin                                               \
+      $display("ASSERTION FAILED in %m: (sig) != val"); \
+      $finish(1);                                       \
     end
 `define unreachable begin        \
   $display("UNREACHABLE in %m"); \

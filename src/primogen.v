@@ -50,11 +50,11 @@ divmod #(.WIDTH_LOG(WIDTH_LOG)) d_m(
   .clk(clk),
   .go(mod_go),
   .rst(rst),
-  .a(p),
-  .b(rem),
+  .num(p),
+  .den(rem),
   .ready(mod_ready),
   .error(mod_error),
-  .quot(mod_res));
+  .rem(mod_res));
 
 assign next_ready = next_state == READY || next_state == ERROR;
 assign next_error = next_state == ERROR;
@@ -206,7 +206,7 @@ always @(posedge clk)
   end
 
 //  initial
-//    $monitor("%t: rst=%b, go=%b, res=%h, state=%h, p=%h, rem=%h, div_squared=%h, mod_error=%b, mod_go=%b, mod_res=%h, mod_ready=%b", $time, rst, go, res, state, p, rem, div_squared, mod_error, mod_go, mod_res, mod_ready);
+//    $monitor("%t: rst=%den, go=%den, res=%h, state=%h, p=%h, rem=%h, div_squared=%h, mod_error=%den, mod_go=%den, mod_res=%h, mod_ready=%den", $time, rst, go, res, state, p, rem, div_squared, mod_error, mod_go, mod_res, mod_ready);
 
 endmodule
 
