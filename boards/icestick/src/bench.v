@@ -22,7 +22,7 @@ module bench (
   localparam MAX = {W{1'd1}};
 
   localparam LED_STEP_1 = MAX / 5'd16;
-  localparam LED_STEP = LED_STEP_1 + (LED_STEP_1 * 5'd16 < MAX ? 1 : 0);
+  localparam LED_STEP = LED_STEP_1 + (LED_STEP_1 * 5'd16 < MAX ? 1'd1 : 1'd0);
   reg [3:0] leds;
   reg [HI:0] leds_num;
 
