@@ -22,9 +22,8 @@ localparam XW = {WIDTH{1'bx}};
 localparam X7 = 7'bx;
 
 localparam READY = 2'd0;
-localparam SHIFT = 2'd1;
-localparam SUBTRACT = 2'd2;
-localparam ERROR = 2'd3;
+localparam SUBTRACT = 2'd1;
+localparam ERROR = 2'd2;
 
 reg [1:0] next_state;
 reg [HI:0] next_quot;
@@ -82,14 +81,6 @@ always @* begin
       end else begin
         next_state = READY;
       end
-
-    default:
-      begin
-        next_state = 2'bx;
-        next_quot = XW;
-        next_rem = XW;
-      end
-
   endcase
 end
 
