@@ -1,0 +1,22 @@
+$(shell mkdir -p bin)
+
+SRC = ../../src/divmod.v ../../src/primogen.v ../../src/prio_enc.v
+
+all: bin/blink.bin bin/bench.bin
+
+flash-%: bin/%.bin
+	TODO: flashing with iceprog not tested yet
+
+bin/%.bin: bin/%.asc
+	icepack $< $@
+
+bin/%.asc: bin/%.blif
+	arachne-pnr -d 1k -o $@ -p syn/icestick.pcf $^
+
+bin/%.blif: src/%.v $(SRC)
+	yosys -p "synth_ice40 -top $* -blif $@" $^
+
+clean:
+	rm -rf bin/*
+
+.PHONY: clean all

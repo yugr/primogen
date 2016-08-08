@@ -28,7 +28,8 @@ $ make all
 ```
 This will generate bitmaps using Lattice synthsizer and
 default backend flow (for Synplify synthesizer, set
-LSE\_OR\_SYNP to 0).
+LSE\_OR\_SYNP to 0). To use Yosys toolchain, append
+`-f Makefile.yosys` to make invocation.
 
 To flash generated bitmaps to device, do
 ```
