@@ -10,6 +10,9 @@ sieve of Eratosthenes)
 
 Also in present state it may violate common Verilog coding practices.
 
+For now, this has only been tested on Cygwin but porting to Linux
+should be straightforward.
+
 # Run
 
 To simulate and synthesize via Icarus, run
