@@ -26,10 +26,6 @@ To generate code for iCEstick, do
 $ cd boards/icestick
 $ make all
 ```
-This will generate bitmaps using Lattice synthsizer and
-default backend flow (for Synplify synthesizer, set
-LSE\_OR\_SYNP to 0). To use Yosys toolchain, append
-`-f Makefile.yosys` to make invocation.
 
 To flash generated bitmaps to device, do
 ```
@@ -41,14 +37,23 @@ $BITMAP can be either _blink_ (computes new prime every
 or _bench_ (computes 16-bit primes and lits green LED when
 done).
 
-To simulate via Active-HDL (which comes with iCEcube):
+Above instructions will use standard Lattice synthsizer
+with default settings (you may need to customize
+ICE\_ROOT and LM\_LICENSE\_FILE variables for your
+environment).
+
+To use Synplify synthesizer, set LSE\_OR\_SYNP to 0.
+To use Yosys toolchain, append `-f Makefile.yosys`
+to make invocation.
+
+Finally, to simulate via Active-HDL (which comes
+with iCEcube):
 ```
 $ make test
 ```
 
 # TODO
 
-* port to iCEstick Yosys toolchain
 * get code reviewed by more professional designers and fix accordingly
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))
 * utilize onboard RAM to implement Eratosthenes sieve (?)

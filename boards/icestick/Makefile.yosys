@@ -5,7 +5,7 @@ SRC = ../../src/divmod.v ../../src/primogen.v ../../src/prio_enc.v
 all: bin/blink.bin bin/bench.bin
 
 flash-%: bin/%.bin
-	TODO: flashing with iceprog not tested yet
+	iceprog $<
 
 bin/%.bin: bin/%.asc
 	icepack $< $@
