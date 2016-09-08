@@ -55,6 +55,7 @@ $ make test
 # TODO
 
 * get code reviewed by more professional designers and fix accordingly
+* add UART output
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))
 * automatically explore synthesis options to generate more efficient design
 * TODOs and FIXMEs in code
