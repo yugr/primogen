@@ -1,6 +1,6 @@
 # files
 add_file -verilog ../../../src/primogen.v
-add_file -verilog ../../../src/divmod.v
+add_file -verilog ../../../src/divrem.v
 add_file -verilog ../../../src/prio_enc.v
 add_file -verilog ../src/blink.v
 add_file -verilog ../src/ram.v

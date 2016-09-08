@@ -31,7 +31,7 @@
 
 # files
 -ver "src/primogen.v"
--ver "src/divmod.v"
+-ver "src/divrem.v"
 -ver "src/prio_enc.v"
 -ver "boards/icestick/src/blink.v"
 -ver "boards/icestick/src/ram.v"

@@ -1,6 +1,6 @@
 `include "defines.vh"
 
-module divmod #(
+module divrem #(
   parameter WIDTH_LOG = 4
 ) (
   input clk,

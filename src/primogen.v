@@ -78,7 +78,7 @@ ram #(.WIDTH(WIDTH)) primes(
   .dout(dout)
 );
 
-divmod #(.WIDTH_LOG(WIDTH_LOG)) d_m(
+divrem #(.WIDTH_LOG(WIDTH_LOG)) d_m(
   .clk(clk),
   .go(div_go),
   .rst(rst),
@@ -147,7 +147,7 @@ always @* begin
       end
 
     PRIME_DIVIDE_DLY:
-      // Wait state to allow divmod to register inputs and update ready bit
+      // Wait state to allow divrem to register inputs and update ready bit
       next_state = PRIME_DIVIDE_WAIT;
 
     PRIME_DIVIDE_WAIT:
@@ -174,7 +174,7 @@ always @* begin
       end
 
     DIVIDE_DLY:
-      // Wait state to allow divmod to register inputs and update ready bit
+      // Wait state to allow divrem to register inputs and update ready bit
       next_state = DIVIDE_WAIT;
 
     DIVIDE_WAIT:

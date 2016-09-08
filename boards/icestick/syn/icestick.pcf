@@ -2,10 +2,10 @@
 
 set_io clk 21
 
-# LEDs
-#  1
-# 452
-#  3
+# === LEDs ===
+#       1
+# CHIP 452 PMOD
+#       3
 set_io LED1 99
 set_io LED2 98
 set_io LED3 97
