@@ -27,7 +27,7 @@ bin/sbt/outputs/bitmap/%_bitmap.bin: bin/%.edf syn/icestick.pcf backend.tcl
 	$$TCL ./backend.tcl $*
 
 ifeq ($(LSE_OR_SYNP), 0)
-bin/%.edf: syn/%_synp.prj src/%.v ../../src/*
+bin/%.edf: syn/%_synp.prj src/* ../../src/*
 	. ./set_vars.sh $(ICE_ROOT)
 	rm -f $@
 	rc=0
@@ -37,7 +37,7 @@ bin/%.edf: syn/%_synp.prj src/%.v ../../src/*
 	# Synplify does not know about error codes so check
 	test -f $@
 else
-bin/%.edf: syn/%_lse.prj src/%.v ../../src/*
+bin/%.edf: syn/%_lse.prj src/* ../../src/*
 	. ./set_vars.sh $(ICE_ROOT)
 	rm -f $@
 	$$SYNTH_LSE -f $<

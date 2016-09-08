@@ -3,12 +3,9 @@
 Primogen is a toy prime number generator in Verilog which I wrote to
 learn HW design.
 
-It's mostly useless, mainly because
-* HW algorithms are not optimized
-* found primes are not cached to avoid repetative work (like in
-sieve of Eratosthenes)
-
-Also in present state it may violate common Verilog coding practices.
+It's mostly useless, mainly because the simplest math and HW algorithms
+are used. Also in present state it may violate common Verilog coding
+practices.
 
 For now, this has only been tested on Cygwin but porting to Linux
 should be straightforward.
@@ -37,7 +34,7 @@ $ make flash-$BITMAP
 
 $BITMAP can be either _blink_ (computes new prime every
 5 seconds and displays it's least-significant bits on LEDs)
-or _bench_ (computes 16-bit primes and lits green LED when
+or _bench_ (computes all 16-bit primes and lits green LED when
 done).
 
 Above instructions will use standard Lattice synthsizer
@@ -59,7 +56,6 @@ $ make test
 
 * get code reviewed by more professional designers and fix accordingly
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))
-* utilize onboard RAM to implement Eratosthenes sieve (?)
 * automatically explore synthesis options to generate more efficient design
 * TODOs and FIXMEs in code
 
