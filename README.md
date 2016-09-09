@@ -37,12 +37,10 @@ $BITMAP can be either _blink_ (computes new prime every
 or _bench_ (computes all 16-bit primes and lits green LED when
 done).
 
-Above instructions will use standard Lattice synthsizer
-with default settings (you may need to customize
-ICE\_ROOT and LM\_LICENSE\_FILE variables for your
-environment).
+Above instructions will use Synplify (you may need to
+customize ICE\_ROOT variable for your environment).
 
-To use Synplify synthesizer, set LSE\_OR\_SYNP to 0.
+To use Lattice synthesizer, set USE\_LSE\_SYNTH to 1.
 To use Yosys toolchain, append `-f Makefile.yosys`
 to make invocation.
 
