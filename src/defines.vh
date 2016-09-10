@@ -1,5 +1,16 @@
-`ifndef synthesis
-`ifndef SYNTHESIS
+`ifdef synthesis
+`ifdef SIM
+SIM and synthesis should not be defined simultaneously
+`endif
+`endif
+
+`ifdef SYNTHESIS
+`ifdef SIM
+SIM and SYNTHESIS should not be defined simultaneously
+`endif
+`endif
+
+`ifdef SIM
 `define assert(sig, val)                                \
   if ((sig) !== val)                                    \
     begin                                               \
@@ -13,10 +24,7 @@
 `define mark begin                 \
     $display("Line %d", __LINE__); \
   end
-`endif
-`endif
-
-`ifndef assert
+`else
 `define assert(sig, val) ;
 `define unreachable ;
 `define mark ;

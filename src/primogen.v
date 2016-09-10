@@ -16,11 +16,11 @@ localparam HI = WIDTH - 1;
 
 localparam ADDR_WIDTH = 8;
 localparam ADDR_HI = ADDR_WIDTH - 1;
-`ifdef synthesis
-localparam ADDR_MAX = {ADDR_WIDTH{1'b1}};
-`else
+`ifdef SIM
 // Use reduced RAM for tests
-localparam ADDR_MAX = 8'd4;
+localparam ADDR_MAX = 3'd4;
+`else
+localparam ADDR_MAX = {ADDR_WIDTH{1'b1}};
 `endif
 
 localparam XW = {WIDTH{1'bx}};
@@ -264,7 +264,7 @@ always @(posedge clk)
     write_en <= next_write_en;
   end
 
-`ifndef synthesis
+`ifdef SIM
 //  initial
 //    $monitor("%t: clk=%b, go=%b, state=%h, res=%0d, addr=%0d, naddrs=%0d, write_en=%0d, div=%0d, div_squared=%0d, div_go=%b, rem=%0d, div_ready=%b", $time, clk, go, state, res, addr, naddrs, write_en, div, div_squared, div_go, rem, div_ready);
 `endif

@@ -7,7 +7,7 @@ module ram #(
   input clk,
   output wire [WIDTH - 1:0] dout);
 
-`ifdef synthesis
+`ifndef SIM
 This module is only meant for simulation
 `endif
 
