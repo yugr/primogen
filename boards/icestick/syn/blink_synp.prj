@@ -6,6 +6,7 @@ add_file -verilog ../../../src/divrem.v
 add_file -verilog ../../../src/prio_enc.v
 add_file -verilog ../src/blink.v
 add_file -verilog ../src/ram.v
+add_file -verilog ../src/ram256x16.v
 #add_file -constraint -lib work "primogen.sdc"
 
 set_option -top_module blink

@@ -40,7 +40,7 @@ done).
 Above instructions will use Synplify (you may need to
 customize ICE\_ROOT variable for your environment).
 
-To use Lattice synthesizer, set USE\_LSE\_SYNTH to 1.
+To use Lattice synthesizer, set USE\_LSE to 1.
 To use Yosys toolchain, append `-f Makefile.yosys`
 to make invocation.
 
@@ -52,6 +52,7 @@ $ make test
 
 # TODO
 
+* fix Yosys and AHDL
 * get code reviewed by more professional designers and fix accordingly
 * add UART output
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))

@@ -1,61 +1,72 @@
-// From iCEcube UG
-module ram256x8(
-  input [15:0] din,
-  input [7:0] addr,
-  input write_en,
-  input clk,
-  output [15:0] dout);
-
-reg [15:0] mem [7:0];
-
-always @(posedge clk) begin
-  if (write_en)
-    mem[addr] <= din;
-end
-
-assign dout = mem[addr];
-
-endmodule
+// Arbitrary-sized RAM.
+//
+// Both Lattice and Synopsis do not seem
+// to be capable of infering cascaded BRAMs
+// out-of-the-box, hence the mess below.
 
 module ram #(
-  parameter WIDTH = 16
+  parameter WIDTH = 16,
+  parameter ADDR_WIDTH = 8
 ) (
   input [WIDTH - 1:0] din,
-  input wire [7:0] addr,  // TODO: support deeper RAMs
+  input wire [ADDR_WIDTH - 1:0] addr,
   input wire write_en,
   input clk,
-  output wire [WIDTH - 1:0] dout);
+  output reg [WIDTH - 1:0] dout);
 
 localparam HI = WIDTH - 1;
 
 localparam NWORDS = (WIDTH + 15) / 16;
-localparam PAD = NWORDS * 16 - WIDTH;
+localparam WIDTH_PAD = NWORDS * 16 - WIDTH;
 localparam WIDTH_ALIGN = NWORDS * 16;
-localparam HI_ALIGN = WIDTH_ALIGN - 1;
 
-wire [HI_ALIGN:0] din_exp;
-wire [HI_ALIGN:0] dout_exp;
+// Address
+//   addr[ADDR_WIDTH - 1:0]
+// is split to 'offset' (in 16-bit words):
+//   offset = addr[7:0]
+// and 'selector':
+//   sel = addr[ADDR_WIDTH - 1:8]
+// The 8-bit 'offset' part can be mapped to block RAM
+// and 'sel' is then implemented on top of it as mux.
 
-assign din_exp = {{PAD{1'b0}}, din};
-assign dout = dout_exp[HI:0];
+localparam SEL_WIDTH = ADDR_WIDTH <= 8 ? 0 : ADDR_WIDTH - 8;
+localparam NSEL = 1 << SEL_WIDTH;
 
-// Lattice toolchains don't seem to support cascaded BRAMs
-// out-of-the-box, hence the mess below.
-//
-// I could have merged banks to single BRAM block to save gates
-// but I'm not sure if that's universally synthesizable.
+wire [WIDTH_ALIGN - 1:0] din_pad;
+wire [NSEL*WIDTH_ALIGN - 1:0] douts;
 
-genvar i;
+wire [7:0] offset;
+wire [SEL_WIDTH - 1:0] sel;
+
+assign din_pad = din;
+
+assign offset = addr[7:0];
+assign sel = NSEL == 1 ? 1'b0 : addr[ADDR_WIDTH - 1:8];
+
+genvar i, j;
 generate
-  for(i = 0; i < WIDTH_ALIGN; i = i + 16) begin
-    ram256x8 bank (
-      .din(din_exp[i + 15:i]),
-      .addr(addr[7:0]),
-      .write_en(write_en),
+  for(i = 0; i < NSEL; i = i + 1) begin
+  for(j = 0; j < WIDTH_ALIGN; j = j + 16) begin
+    ram256x16 bank (
+      .din(din_pad[j + 15:j]),
+      .addr(offset),
+      .write_en(write_en & (sel == i)),  // TODO: use decoder?
       .clk(clk),
-      .dout(dout_exp[i + 15:i]));
+      .dout(douts[i*WIDTH_ALIGN + j + 15:i*WIDTH_ALIGN + j]));
+  end
   end
 endgenerate
+
+integer k, l;
+
+always @* begin
+  dout = {WIDTH{1'bx}};
+  for(k = 0; k < NSEL; k = k + 1) begin
+    if (sel == k)  // TODO: use decoder?
+      for (l = 0; l < WIDTH; l = l + 1)
+        dout[l] = douts[k*WIDTH_ALIGN + l];
+  end
+end
 
 endmodule
 

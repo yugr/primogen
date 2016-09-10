@@ -1,6 +1,6 @@
 $(shell mkdir -p bin)
 
-SRC = ../../src/divrem.v ../../src/primogen.v ../../src/prio_enc.v
+SRC = ../../src/divrem.v ../../src/primogen.v ../../src/prio_enc.v src/ram.v src/ram256x16.v
 
 all: bin/blink.bin bin/bench.bin
 

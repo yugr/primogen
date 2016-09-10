@@ -70,7 +70,7 @@ wire div_error;
 wire [HI:0] rem;
 wire [HI:0] dout;
 
-ram #(.WIDTH(WIDTH)) primes(
+ram #(.WIDTH(WIDTH), .ADDR_WIDTH(ADDR_WIDTH)) primes(
   .din(res),
   .addr(next_addr),  // Save one cycle by feeding combinational input
   .write_en(write_en),

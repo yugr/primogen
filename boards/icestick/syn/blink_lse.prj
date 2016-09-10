@@ -34,6 +34,7 @@
 -ver "src/divrem.v"
 -ver "src/prio_enc.v"
 -ver "boards/icestick/src/blink.v"
+-ver "boards/icestick/src/ram256x16.v"
 -ver "boards/icestick/src/ram.v"
 -p "../.."
 -top blink
