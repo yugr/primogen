@@ -101,8 +101,10 @@ always @(posedge clk)
     error <= next_error;
   end
 
+`ifndef synthesis
 //  initial
 //    $monitor("%t: go=%h, num=%0d, den=%0d, quot=%h, rem=%0d, a=%0d, state=%h, rem_msb=%h, den_msb=%h, sub=%0d, shift=%h, ready=%h", $time, go, num, den, quot, rem, a, state, rem_msb, den_msb, sub, shift, ready);
+`endif
 
 endmodule
 

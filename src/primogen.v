@@ -264,8 +264,10 @@ always @(posedge clk)
     write_en <= next_write_en;
   end
 
-  initial
-    $monitor("%t: clk=%b, go=%b, state=%h, res=%0d, addr=%0d, naddrs=%0d, write_en=%0d, div=%0d, div_squared=%0d, div_go=%b, rem=%0d, div_ready=%b", $time, clk, go, state, res, addr, naddrs, write_en, div, div_squared, div_go, rem, div_ready);
+`ifndef synthesis
+//  initial
+//    $monitor("%t: clk=%b, go=%b, state=%h, res=%0d, addr=%0d, naddrs=%0d, write_en=%0d, div=%0d, div_squared=%0d, div_go=%b, rem=%0d, div_ready=%b", $time, clk, go, state, res, addr, naddrs, write_en, div, div_squared, div_go, rem, div_ready);
+`endif
 
 endmodule
 
