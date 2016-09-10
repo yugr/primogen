@@ -1,0 +1,14 @@
+source "synp_common.prj"
+
+# files
+add_file -verilog ../src/ram_test.v
+add_file -verilog ../src/ram256x16.v
+
+set_option -top_module ram_test
+
+# set result format/file last
+project -result_format "edif"
+project -result_file "../bin/ram_test.edf"
+project -log_file "../bin/ram_test.srr"
+project -run synthesis -clean
+
