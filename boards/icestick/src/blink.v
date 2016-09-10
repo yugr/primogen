@@ -3,11 +3,7 @@
 
 module blink (
   input clk,
-  output LED1,
-  output LED2,
-  output LED3,
-  output LED4,
-  output LED5);
+  output [4:0] LED);
 
   reg [27:0] clk_count;
   reg pulse_5_sec;
@@ -68,6 +64,7 @@ module blink (
     end
   end
 
+  // TODO: this does not seem to work...
   always @(posedge clk) begin
     if (rst_count == 4'd15)
       rst <= 0;
@@ -76,10 +73,7 @@ module blink (
     end
   end
 
-  assign LED1 = prime[0];
-  assign LED2 = prime[1];
-  assign LED3 = prime[2];
-  assign LED4 = prime[3];
-  assign LED5 = err;
+  assign LED[3:0] = prime[3:0];
+  assign LED[4] = err;
 
 endmodule

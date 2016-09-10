@@ -4,11 +4,7 @@
 
 module bench (
   input clk,
-  output LED1,
-  output LED2,
-  output LED3,
-  output LED4,
-  output LED5);
+  output LED[4:0]);
 
   // Not sure it's universally synthesizable
   // but ok for FPGA.
@@ -23,7 +19,6 @@ module bench (
 
   localparam LED_STEP_1 = MAX / 5'd16;
   localparam LED_STEP = LED_STEP_1 + (LED_STEP_1 * 5'd16 < MAX ? 1'd1 : 1'd0);
-  reg [3:0] leds;
   reg [HI:0] leds_num;
 
   reg go;
@@ -52,7 +47,7 @@ module bench (
     end
   end
 
-  // Initial reset
+  // TODO: this does not seem to work...
   always @(posedge clk) begin
     if (rst_count == 4'd15)
       rst <= 0;
@@ -68,19 +63,14 @@ module bench (
 
   always @(posedge clk) begin
     if (rst) begin
-      leds <= 0;
+      LED[3:0] <= 3'b0;
       leds_num <= 0;
     end else begin
       if (prime > leds_num) begin
-        leds <= leds + 1'd1;
+        LED[3:0] <= LED[3:0] + 1'd1;
         leds_num <= leds_num + LED_STEP;
       end
     end
   end
-
-  assign LED1 = leds[0];
-  assign LED2 = leds[1];
-  assign LED3 = leds[2];
-  assign LED4 = leds[3];
 
 endmodule

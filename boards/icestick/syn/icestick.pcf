@@ -3,11 +3,11 @@
 set_io clk 21
 
 # === LEDs ===
-#       1
-# CHIP 452 PMOD
-#       3
-set_io LED1 99
-set_io LED2 98
-set_io LED3 97
-set_io LED4 96
-set_io LED5 95
+#       0
+# CHIP 341 PMOD
+#       2
+set_io LED[0] 99
+set_io LED[1] 98
+set_io LED[2] 97
+set_io LED[3] 96
+set_io LED[4] 95
