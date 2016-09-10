@@ -17,7 +17,7 @@ if ! test -f $CFG; then
 fi
 
 # From this we'll get LM_LICENSE_FILE, SBT_DIR and TCL_LIBRARY
-for var in $(sed -ne '/<Environment>/,/<\/Environment>/{ />.*</{ s!.*<\([A-Za-z_0-9]\+\).*>\(.*\)<.*!\1=\2! ; s!\$(RootPath)!'$ICE_ROOT'! ; p } }' $CFG | tr '\' '/'); do
+for var in $(sed -ne '/<Environment>/,/<\/Environment>/{ />.*</{ s!.*<\([A-Za-z_0-9]\+\).*>\(.*\)<.*!\1=\2! ; s!\$(RootPath)!'$ICE_ROOT'! ; p } }' $CFG | tr '\\' '/'); do
   eval "export $var"
 done
 
