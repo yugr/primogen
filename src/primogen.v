@@ -14,6 +14,8 @@ module primogen #(
 localparam WIDTH = 1 << WIDTH_LOG;
 localparam HI = WIDTH - 1;
 
+// Note that incrementing width by 1 bit
+// would double BRAM consumption
 localparam ADDR_WIDTH = 8;
 localparam ADDR_HI = ADDR_WIDTH - 1;
 `ifdef SIM
