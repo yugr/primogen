@@ -5,34 +5,32 @@ This file shouldn't be used in simulation...
 // Hopefully 256x16 is universally synthesizable
 // across different HW/tools vendors (otherwise
 // we can switch to 512x8).
-//
-// TODO: implement for Yosys as well
 module ram256x16(
   input [15:0] din,
   input [7:0] addr,
   input write_en,
   input clk,
-  output [15:0] dout);
+  output reg [15:0] dout);
 
-//`define OLD 1
+// Disable to use BRAM primitives
+`define INFER_BRAM 1
 
-`ifdef OLD
+`ifdef INFER_BRAM
 
-// This does not seem to work...
-
-reg [15:0] mem [7:0];  // 16 * 256 == 4K
+reg [15:0] mem [255:0];  // 16 * 256 == 4K
 
 always @(posedge clk) begin
   if (write_en)
     mem[addr] <= din;
+  dout <= mem[addr];
 end
-
-assign dout = mem[addr];
 
 `else
 
+wire [15:0] out;
+
 SB_RAM256x16 ram_inst (
-  .RDATA(dout),
+  .RDATA(out),
   .RADDR(addr),
   .RCLK(clk),
   .RCLKE(1'b1),
@@ -44,6 +42,9 @@ SB_RAM256x16 ram_inst (
   .WE(write_en),
   .MASK(16'b0)  // Negative logic
 );
+
+always @(posedge clk)
+  dout <= out;
 
 `endif
 

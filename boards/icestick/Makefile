@@ -21,6 +21,7 @@ flash-%: syn/%_flash.xcf bin/sbt/outputs/bitmap/%_bitmap.bin
 
 bitmap-blink: $(BLINK)
 bitmap-bench: $(BENCH)
+bitmap-ram_test: bin/sbt/outputs/bitmap/ram_test_bitmap.bin
 
 bin/sbt/outputs/bitmap/%_bitmap.bin: bin/%.edf syn/icestick.pcf backend.tcl
 	. ./set_vars.sh $(ICE_ROOT)
