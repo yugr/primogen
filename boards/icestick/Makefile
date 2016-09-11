@@ -32,7 +32,7 @@ ifeq ($(USE_LSE), 1)
 bin/%.edf: syn/%_lse.prj src/%.v src/ram*.v src/por.v ../../src/*
 	. ./set_vars.sh $(ICE_ROOT)
 	rm -f $@
-	$$SYNTH_LSE -f $<
+	$$LSE_SYN -f $<
 	# Move all the generated trash to output dir
 	mv .vdbs* *.v.ve *_prim.v *.arearep xxx_lse_* *.log *.twr bin
 	# Synplify does not know about error codes so check
@@ -42,7 +42,7 @@ bin/%.edf: syn/%_synp.prj src/%.v src/ram*.v src/por.v ../../src/*
 	. ./set_vars.sh $(ICE_ROOT)
 	rm -f $@
 	rc=0
-	$$SYNTH_SYN -prj $< || rc=$$?
+	$$SYNP_SYN -prj $< || rc=$$?
 	cat stdout.log
 	test $$rc=0
 	# Synplify does not know about error codes so check

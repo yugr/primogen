@@ -39,15 +39,15 @@ fi
 
 # Tool paths (for Makefile)
 
-SYNTH_LSE=$ICE_ROOT/LSE/bin/nt/synthesis
-if ! test -x $SYNTH_LSE; then
-  echo >&2 "Lattice synthesizer not found in $SYNTH_LSE"
+LSE_SYN=$ICE_ROOT/LSE/bin/nt/synthesis
+if ! test -x $LSE_SYN; then
+  echo >&2 "Lattice synthesizer not found in $LSE_SYN"
   exit 1
 fi
 
-SYNTH_SYN=$ICE_ROOT/sbt_backend/bin/win32/opt/synpwrap/synpwrap
-if ! test -x $SYNTH_SYN; then
-  echo >&2 "Synplify not found in $SYNTH_SYN"
+SYNP_SYN=$ICE_ROOT/sbt_backend/bin/win32/opt/synpwrap/synpwrap
+if ! test -x $SYNP_SYN; then
+  echo >&2 "Synplify not found in $SYNP_SYN"
   exit 1
 fi
 
