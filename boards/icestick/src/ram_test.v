@@ -10,7 +10,7 @@ module ram #(
   input clk,
   output [WIDTH - 1:0] dout);
 
-  reg [WIDTH - 1:0] mem [ADDR_WIDTH - 1:0];  // 16 * 256 == 4K
+  reg [WIDTH - 1:0] mem [(1 << ADDR_WIDTH) - 1:0];  // 16 * 256 == 4K
 
   always @(posedge clk) begin
     if (write_en)
@@ -24,8 +24,8 @@ module ram_test (
   input clk,
   output LED1);
 
-  localparam WIDTH = 16;
-  localparam ADDR_WIDTH = 8;
+  localparam WIDTH = 32;
+  localparam ADDR_WIDTH = 9;
 
   reg [ADDR_WIDTH - 1:0] addr;
   reg [WIDTH - 1:0] din;
@@ -33,7 +33,10 @@ module ram_test (
   reg write_en;
 
   // Triggers "Input port bits 7 to 3 of addr[7:0] are unused."
-  ram ram_inst(
+  ram #(
+    .WIDTH(WIDTH),
+    .ADDR_WIDTH(ADDR_WIDTH)
+  ) ram_inst (
     .din(din),
     .dout(dout),
     .write_en(write_en),
