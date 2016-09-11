@@ -8,11 +8,6 @@ module blink (
   reg [27:0] clk_count;
   reg pulse_5_sec;
 
-  // Not sure it's universally synthesizable
-  // but ok for FPGA.
-  reg rst = 1;
-  reg [3:0] rst_count = 4'd15;
-
   // WLOG=5 (i.e. 32-bit primes) takes a LOT more time to build...
   localparam WLOG = 4;
   localparam W = 1 << WLOG;
@@ -21,7 +16,10 @@ module blink (
   reg go;
   wire rdy, err;
   wire [HI:0] res;
-  reg [HI:0] prime;
+
+  wire rst;
+
+  por por_isnt(.clk(clk), .rst(rst));
 
   primogen #(.WIDTH_LOG(WLOG)) pg(
     .clk(clk),
@@ -36,7 +34,6 @@ module blink (
 
   always @(posedge clk) begin
     if (rst) begin
-
       pulse_5_sec <= 0;
       clk_count <= 0;
     end else begin
@@ -53,27 +50,16 @@ module blink (
   always @(posedge clk) begin
     if (rst) begin
       go <= 0;
-      prime <= 0;
     end else begin
       go <= 0;
       // !go - give primogen 1 clock to register inputs
       if (rdy && !err && !go && pulse_5_sec) begin
         go <= 1;
-        prime <= res;
       end
     end
   end
 
-  // TODO: this does not seem to work...
-  always @(posedge clk) begin
-    if (rst_count == 4'd15)
-      rst <= 0;
-    else begin
-      rst_count = rst_count + 1'd1;
-    end
-  end
-
-  assign LED[3:0] = prime[3:0];
+  assign LED[3:0] = res[3:0];
   assign LED[4] = err;
 
 endmodule

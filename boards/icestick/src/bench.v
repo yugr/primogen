@@ -6,11 +6,6 @@ module bench (
   input clk,
   output LED[4:0]);
 
-  // Not sure it's universally synthesizable
-  // but ok for FPGA.
-  reg rst = 1;
-  reg [3:0] rst_count = 4'd15;
-
   // WLOG=5 (i.e. 32-bit primes) takes a LOT more time to build...
   localparam WLOG = 4;
   localparam W = 1 << WLOG;
@@ -25,6 +20,10 @@ module bench (
   wire rdy, err;
   wire [HI:0] res;
   reg [HI:0] prime;
+
+  wire rst;
+
+  por por_inst(.clk(clk), .rst(rst));
 
   primogen #(.WIDTH_LOG(WLOG)) pg(
     .clk(clk),
@@ -47,30 +46,19 @@ module bench (
     end
   end
 
-  // TODO: this does not seem to work...
-  always @(posedge clk) begin
-    if (rst_count == 4'd15)
-      rst <= 0;
-    else begin
-      rst_count = rst_count + 1'd1;
-    end
-  end
-
-  // This will be lit on overflow
-  assign LED5 = err;
-
   // Show progress
 
   always @(posedge clk) begin
     if (rst) begin
-      LED[3:0] <= 3'b0;
       leds_num <= 0;
     end else begin
       if (prime > leds_num) begin
-        LED[3:0] <= LED[3:0] + 1'd1;
         leds_num <= leds_num + LED_STEP;
       end
     end
   end
+
+  assign LED[3:0] = leds_num;
+  assign LED[4] = err;  // Overflow
 
 endmodule

@@ -36,6 +36,7 @@
 -ver "boards/icestick/src/blink.v"
 -ver "boards/icestick/src/ram256x16.v"
 -ver "boards/icestick/src/ram.v"
+-ver "boards/icestick/src/por.v"
 -p "../.."
 -top blink
 

@@ -35,6 +35,7 @@
 -ver "src/prio_enc.v"
 -ver "boards/icestick/src/ram.v"
 -ver "boards/icestick/src/ram256x16.v"
+-ver "boards/icestick/src/por.v"
 -ver "boards/icestick/src/bench.v"
 -p "../.."
 -top bench
