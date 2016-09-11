@@ -4,7 +4,7 @@
 
 module bench (
   input clk,
-  output LED[4:0]);
+  output [4:0] LED);
 
   // WLOG=5 (i.e. 32-bit primes) takes a LOT more time to build...
   localparam WLOG = 4;
