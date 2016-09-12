@@ -6,7 +6,7 @@ module ram #(
   input wire [ADDR_WIDTH - 1:0] addr,
   input wire write_en,
   input clk,
-  output wire [WIDTH - 1:0] dout);
+  output reg [WIDTH - 1:0] dout);
 
 `ifndef SIM
 This module is only meant for simulation
@@ -20,9 +20,8 @@ reg [HI:0] mem[(1 << ADDR_WIDTH) - 1:0];
 always @(posedge clk) begin
   if (write_en)
     mem[addr] <= din;
+  dout <= mem[addr];
 end
-
-assign dout = mem[addr];
 
 endmodule
 
