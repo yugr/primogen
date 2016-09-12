@@ -28,7 +28,7 @@ initial begin
   @(negedge clk) rst = 0;
   #10;
 
-  while (clk_count < 10000) begin
+  while (clk_count < 20000) begin
     // Ask for next prime
     @(negedge clk) go = 1;
     @(posedge clk) @(negedge clk) go = 0;
@@ -37,7 +37,7 @@ initial begin
     @(posedge gen_ready) res_count = res_count + 1;
   end
 
-  $display("primogen_bench SUCCEEDED: Computed %0d primes (in %0d cycles)", res_count, $time);
+  $display("primogen_bench SUCCEEDED: Computed %0d primes (in %0d cycles)", res_count, clk_count);
   $finish;
 end
 

@@ -8,6 +8,7 @@ USE_LSE = 0
 
 BLINK = bin/sbt/outputs/bitmap/blink_bitmap.bin
 BENCH = bin/sbt/outputs/bitmap/bench_bitmap.bin
+RAM_TEST = bin/sbt/outputs/bitmap/ram_test_bitmap.bin
 
 all: $(BLINK) $(BENCH)
 
@@ -21,7 +22,7 @@ flash-%: syn/%_flash.xcf bin/sbt/outputs/bitmap/%_bitmap.bin
 
 bitmap-blink: $(BLINK)
 bitmap-bench: $(BENCH)
-bitmap-ram_test: bin/sbt/outputs/bitmap/ram_test_bitmap.bin
+bitmap-ram_test: $(RAM_TEST)
 
 bin/sbt/outputs/bitmap/%_bitmap.bin: bin/%.edf syn/icestick.pcf backend.tcl
 	. ./set_vars.sh $(ICE_ROOT)
@@ -59,5 +60,5 @@ clean:
 .PHONY: all clean test
 
 # Can't do this as it disables pattern rules above...
-#.PHONY: flash-blink flash-bench bitmap-blink flash-bench
+#.PHONY: flash-blink flash-bench bitmap-blink bitmap-bench
 
