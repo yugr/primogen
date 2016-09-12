@@ -15,7 +15,7 @@ This module is only meant for simulation
 localparam HI = WIDTH - 1;
 localparam ADDR_HI = ADDR_WIDTH - 1;
 
-reg [HI:0] mem[ADDR_HI:0];
+reg [HI:0] mem[(1 << ADDR_WIDTH) - 1:0];
 
 always @(posedge clk) begin
   if (write_en)
