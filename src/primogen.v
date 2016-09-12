@@ -20,7 +20,7 @@ localparam ADDR_WIDTH = 8;
 localparam ADDR_HI = ADDR_WIDTH - 1;
 `ifdef SIM
 // Use reduced RAM for tests
-localparam ADDR_MAX = 3'd4;
+localparam ADDR_MAX = 8'd4;
 `else
 localparam ADDR_MAX = {ADDR_WIDTH{1'b1}};
 `endif
@@ -41,11 +41,13 @@ localparam DIVIDE_WAIT = 4'd8;
 
 // Combinational logic for outputs
 reg [HI:0] next_res;
+reg [HI:0] next_res_squared;
 wire next_ready;
 wire next_error;
 
 // State
 reg [3:0] state;
+reg [HI:0] res_squared;
 
 // And it's combinational logic
 reg [3:0] next_state;
@@ -71,13 +73,14 @@ wire div_ready;
 wire div_error;
 wire [HI:0] rem;
 wire [HI:0] dout;
+wire [HI:0] dout_squared;
 
-ram #(.WIDTH(WIDTH), .ADDR_WIDTH(ADDR_WIDTH)) primes(
-  .din(res),
-  .addr(next_addr),  // Save one cycle by feeding combinational input
+ram #(.WIDTH(2*WIDTH), .ADDR_WIDTH(ADDR_WIDTH)) primes(
+  .din({res, res_squared}),
+  .addr(addr),  // Save one cycle by feeding combinational input
   .write_en(write_en),
   .clk(clk),
-  .dout(dout)
+  .dout({dout, dout_squared})
 );
 
 divrem #(.WIDTH_LOG(WIDTH_LOG)) d_m(
@@ -96,6 +99,7 @@ assign next_error = next_state == ERROR;
 always @* begin
   next_state = state;
   next_res = res;
+  next_res_squared = res_squared;
 
   next_div = div;
   next_div_squared = div_squared;
@@ -106,19 +110,33 @@ always @* begin
 
   case (state)
     READY, ERROR:
-      if (go)
+      if (go) begin
         next_state = NEXT_CANDIDATE;
+        next_addr = 0;
+      end
 
     NEXT_CANDIDATE:  // TODO: can probably be merged with NEXT_PRIME_DIVISOR
       begin
         // Search for next prime
         case (res)
-          1: next_res = 8'd2;
-          2: next_res = 8'd3;
-          default: next_res = res + 8'd2;
+          1:
+            begin
+              next_res = 8'd2;
+              next_res_squared = 8'd4;
+            end
+          2:
+            begin
+             next_res = 8'd3;
+             next_res_squared = 8'd9;
+           end
+          default:
+            begin
+              next_res = res + 8'd2;
+              next_res_squared = res_squared + (res << 2) + 8'd4;
+            end
         endcase
 
-        if (next_res > res) begin
+        if (next_res > res && next_res_squared > res_squared) begin
           next_state = NEXT_PRIME_DIVISOR;
           next_addr = 0;
         end else begin
@@ -128,9 +146,18 @@ always @* begin
       end
 
     NEXT_PRIME_DIVISOR:
-      if (addr < naddrs) begin
+      if (dout_squared > res) begin
+        next_state = READY;
+        // Store found prime
+        if (res != 1'd1 && res != 2'd2) begin
+          next_write_en = 1'd1;
+          next_addr = naddrs;
+          next_naddrs = naddrs + 1'd1;
+        end
+      end else if (addr < naddrs) begin
         next_state = PRIME_DIVIDE_DLY;
         next_div = dout;
+        next_div_squared = dout_squared;
         next_div_go = 1;
       end else if (naddrs == ADDR_MAX) begin
         // Prime table overflow => use slow check
@@ -140,10 +167,12 @@ always @* begin
         // TODO: we could start immediately from last prime divisor
         // but we need to store prime squares as well.
       end else begin
+        // TODO: can this be removed?
         next_state = READY;
         // Store found prime
         if (res != 1'd1 && res != 2'd2) begin
           next_write_en = 1'd1;
+          next_addr = naddrs;
           next_naddrs = naddrs + 1'd1;
         end
       end
@@ -160,6 +189,7 @@ always @* begin
       else if (rem == 0) begin
         // Divisable => abort and try next candidate
         next_state = NEXT_CANDIDATE;
+        next_addr = 0;
       end else begin
         // Not divisable => try next divisor
         next_state = NEXT_PRIME_DIVISOR;
@@ -222,6 +252,7 @@ always @* begin
       begin
         next_state = 3'bx;
         next_res = XW;
+        next_res_squared = XW;
 
         next_div = XW;
         next_div_squared = XW;
@@ -240,6 +271,7 @@ always @(posedge clk)
     res <= 1;
 
     res <= 1;
+    res_squared <= 1;
     ready <= 1;
     error <= 0;
 
@@ -254,6 +286,7 @@ always @(posedge clk)
     state <= next_state;
 
     res <= next_res;
+    res_squared <= next_res_squared;
     ready <= next_ready;
     error <= next_error;
 
@@ -268,7 +301,7 @@ always @(posedge clk)
 
 `ifdef SIM
 //  initial
-//    $monitor("%t: clk=%b, go=%b, state=%h, res=%0d, addr=%0d, naddrs=%0d, write_en=%0d, div=%0d, div_squared=%0d, div_go=%b, rem=%0d, div_ready=%b", $time, clk, go, state, res, addr, naddrs, write_en, div, div_squared, div_go, rem, div_ready);
+//    $monitor("%t: clk=%b, go=%b, state=%h, res=%0d, res_squared=%0d, addr=%0d, next_addr=%0d, naddrs=%0d, write_en=%0d, div=%0d, div_squared=%0d, div_go=%b, rem=%0d, div_ready=%b, dout=%0d, dout_squared=%0d", $time, clk, go, state, res, res_squared, addr, next_addr, naddrs, write_en, div, div_squared, div_go, rem, div_ready, dout, dout_squared);
 `endif
 
 endmodule

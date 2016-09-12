@@ -22,6 +22,7 @@ bin/divrem.blif: src/prio_enc.v
 # bin/primogen.blif: src/divrem.v src/prio_enc.v
 
 test: test-divrem test-primogen
+bench: test-bench
 
 test-%: bin/%_tb
 	@vvp $<
