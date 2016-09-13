@@ -21,7 +21,7 @@ localparam ADDR_WIDTH = 8;
 localparam ADDR_HI = ADDR_WIDTH - 1;
 `ifdef SIM
 // Use reduced RAM for tests
-localparam ADDR_MAX = 8'd4;
+localparam ADDR_MAX = 8'd8;
 `else
 localparam ADDR_MAX = {ADDR_WIDTH{1'b1}};
 `endif
