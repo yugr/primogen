@@ -42,7 +42,7 @@ always @* begin
     end
     part = part & ((1'd1 << width) - 1'd1);
   end
-  `assert(width, 1)
+  `assert_eq(width, 1)
   msb = start;
 end
 `endif
