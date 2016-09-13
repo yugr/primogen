@@ -5,6 +5,7 @@ reg go = 0;
 reg rst = 0;
 reg [31:0] clk_count = 0;
 reg [31:0] res_count = 0;
+reg overflow = 0;
 
 wire gen_ready;
 wire gen_error;
@@ -34,10 +35,15 @@ initial begin
     @(posedge clk) @(negedge clk) go = 0;
 
     // Wait until prime is computed
-    @(posedge gen_ready) res_count = res_count + 1;
+    @(posedge gen_ready);
+    if (gen_error)
+      overflow = 1;
+
+    if (!overflow)
+      res_count = res_count + 1;
   end
 
-  $display("primogen_bench SUCCEEDED: Computed %0d primes (in %0d cycles)", res_count, clk_count);
+  $display("primogen_bench SUCCEEDED: Computed %0d primes (in %0d cycles), %soverflow", res_count, clk_count, overflow ? "" : "no ");
   $finish;
 end
 

@@ -53,6 +53,7 @@ $ make test
 # TODO
 
 * get rid of useless states and clean up code
+* use SystemVerilog assertions
 * get code reviewed by more professional designers and fix accordingly
 * add UART output
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))

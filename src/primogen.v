@@ -13,6 +13,7 @@ module primogen #(
 
 localparam WIDTH = 1 << WIDTH_LOG;
 localparam HI = WIDTH - 1;
+localparam MAX = {WIDTH{1'b1}};
 
 // Note that incrementing width by 1 bit
 // would double BRAM consumption
@@ -136,13 +137,14 @@ always @* begin
             end
         endcase
 
-        if (next_res > res && next_res_squared > res_squared) begin
-          next_state = NEXT_PRIME_DIVISOR;
-          next_addr = 0;
-        end else begin
-          // Overflow
-          next_state = ERROR;
-        end
+        // Clamp square as it's subject to overflow
+        if (next_res_squared <= res_squared)
+          next_res_squared = MAX;
+
+        next_addr = 0;
+
+        // Check for overflow
+        next_state = next_res > res ? NEXT_PRIME_DIVISOR : ERROR;
       end
 
     NEXT_PRIME_DIVISOR:
@@ -238,14 +240,15 @@ always @* begin
             end
         endcase
 
-        if (next_div > div && next_div_squared > div_squared)
-          next_state = NEXT_DIVISOR;
-        else begin
-          // Overflow
-          next_state = ERROR;
-          next_div = XW;
-          next_div_squared = XW;
-        end
+        // div * div < res so shouldn't overflow
+        `assert_lt(next_div, div);
+
+        // Clamp square as it's subject to overflow
+        // TODO: this may not be necessary
+        if (next_div_squared <= div_squared)
+          next_div_squared = MAX;
+
+        next_state = NEXT_DIVISOR;
       end
 
     default:
