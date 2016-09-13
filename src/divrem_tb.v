@@ -3,7 +3,7 @@ module divrem_tb;
 reg clk = 0;
 
 reg go = 0;
-reg rst = 0;
+wire rst;
 reg [15:0] num = 0;
 reg [15:0] den = 0;
 
@@ -14,6 +14,10 @@ wire [15:0] m1_rem;
 
 reg [15:0] quot;
 reg [15:0] rem;
+
+por por_inst(
+  .clk(clk),
+  .rst(rst));
 
 divrem dm1(
   .clk(clk),
@@ -29,12 +33,7 @@ divrem dm1(
 always #5 clk = !clk;
 
 initial begin
-
-  @(negedge clk);
-  rst = 1;
-  @(posedge clk);
-  @(negedge clk) rst = 0;
-  #10;
+  wait (!rst);
 
   for (num = 0; num < 20; num = num + 1)
   for (den = 0; den < 20; den = den + 1) begin
@@ -46,17 +45,13 @@ initial begin
     rem = num / den;
     quot = num % den;
     if (!m1_ready) begin
-      $display("FAILED -- A=%d, B=%d, READY=0", num, den);
-      $finish(1);
+      $error("FAILED -- A=%d, B=%d, READY=0", num, den);
     end else if (den != 0 && (^m1_div === 1'bx || ^m1_rem === 1'bx)) begin
-      $display("FAILED -- A=%d, B=%d, UNDEF (%d %d)", num, den, m1_div, m1_rem);
-      $finish(1);
+      $error("FAILED -- A=%d, B=%d, UNDEF (%d %d)", num, den, m1_div, m1_rem);
     end else if (rem != m1_div) begin
-      $display("FAILED -- A=%d, B=%d, DIV=%d (should be %d)", num, den, m1_div, rem);
-      $finish(1);
+      $error("FAILED -- A=%d, B=%d, DIV=%d (should be %d)", num, den, m1_div, rem);
     end else if (quot != m1_rem) begin
-      $display("FAILED -- A=%d, B=%d, MOD=%d (should be %d)", num, den, m1_rem, quot);
-      $finish(1);
+      $error("FAILED -- A=%d, B=%d, MOD=%d (should be %d)", num, den, m1_rem, quot);
     end
   end
   $display("divrem_tb SUCCEEDED");

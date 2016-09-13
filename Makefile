@@ -11,9 +11,9 @@ all: bin/divrem.blif bin/prio_enc.blif
 bin/%: src/%.v
 	iverilog $(IVFLAGS_SIM) -N$@.nl -o $@ $^
 
-bin/divrem_tb: src/divrem.v src/prio_enc.v
-bin/primogen_tb: src/primogen.v src/divrem.v src/prio_enc.v src/ram.v
-bin/primogen_bench: src/primogen.v src/divrem.v src/prio_enc.v src/ram.v
+bin/divrem_tb: src/divrem.v src/prio_enc.v src/por.v
+bin/primogen_tb: src/primogen.v src/divrem.v src/prio_enc.v src/ram.v src/por.v
+bin/primogen_bench: src/primogen.v src/divrem.v src/prio_enc.v src/ram.v src/por.v
 
 bin/%.blif: src/%.v
 	iverilog $(IVFLAGS_SYNTH) -o $@ $^

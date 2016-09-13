@@ -11,22 +11,18 @@ SIM and SYNTHESIS should not be defined simultaneously
 `endif
 
 `ifdef SIM
-`define assert_eq(sig, val)                             \
-  if ((sig) !== (val))                                  \
-    begin                                               \
-      $display("ASSERTION FAILED in %m: (sig) != val"); \
-      $finish(1);                                       \
-    end
-`define assert_lt(sig, val)                             \
-  if (!((sig) < (val)))                                 \
-    begin                                               \
-      $display("ASSERTION FAILED in %m: (sig) >= val"); \
-      $finish(1);                                       \
-    end
-`define unreachable begin          \
-    $display("UNREACHABLE in %m"); \
-    $finish(1);                    \
+`define assert_eq(sig, val)                       \
+  if ((sig) !== (val))                            \
+    $error("ASSERTION FAILED in %m: sig != val"); \
+
+`define assert_lt(sig, val)                       \
+  if (!((sig) < (val)))                           \
+    $error("ASSERTION FAILED in %m: sig >= val"); \
+
+`define unreachable begin        \
+    $error("UNREACHABLE in %m"); \
   end
+
 `else
 `define assert_eq(sig, val) ;
 `define assert_lt(sig, val) ;

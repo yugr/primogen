@@ -2,13 +2,17 @@ module primogen_bench;
 
 reg clk = 0;
 reg go = 0;
-reg rst = 0;
+wire rst;
 reg [31:0] clk_count = 0;
 reg [31:0] res_count = 0;
 reg overflow = 0;
 
 wire gen_ready;
 wire gen_error;
+
+por pos_inst(
+  .clk(clk),
+  .rst(rst));
 
 primogen gen(
   .clk(clk),
@@ -23,11 +27,7 @@ always @(posedge clk)
   clk_count = clk_count + 1;
 
 initial begin
-  @(negedge clk);
-  rst = 1;
-  @(posedge clk);
-  @(negedge clk) rst = 0;
-  #10;
+  wait(!rst);
 
   while (clk_count < 20000) begin
     // Ask for next prime

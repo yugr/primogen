@@ -3,7 +3,7 @@ module primogen_tb;
 reg clk = 0;
 
 reg go = 0;
-reg rst = 0;
+wire rst;
 reg [15:0] a = 0;
 reg [15:0] b = 0;
 
@@ -14,6 +14,10 @@ wire [15:0] gen_res;
 parameter N = 13;
 reg [99:0] primes [31:0];
 integer i;
+
+por pos_inst(
+  .clk(clk),
+  .rst(rst));
 
 primogen gen(
   .clk(clk),
@@ -44,25 +48,17 @@ initial begin
   for (i = N; i < 100; i = i + 1)
     primes[i] = 0;
 
-  @(negedge clk);
-  rst = 1;
-  @(posedge clk);
-  @(negedge clk) rst = 0;
-  #10;
+  wait (!rst);
 
   for (i = 0; i < N; ++i) begin
     if (!gen_ready) begin
-      $display("FAILED -- I=%d, READY=0", i);
-      $finish(1);
+      $error("FAILED -- I=%d, READY=0", i);
     end else if (gen_error) begin
-      $display("FAILED -- I=%d, ERROR=1", i);
-      $finish(1);
+      $error("FAILED -- I=%d, ERROR=1", i);
     end else if (^gen_res === 1'bx) begin
-      $display("FAILED -- I=%d, UNDEF (%d)", i, gen_res);
-      $finish(1);
+      $error("FAILED -- I=%d, UNDEF (%d)", i, gen_res);
     end else if (gen_res != primes[i]) begin
-      $display("FAILED -- I=%d, PRIME=%d (should be %d)", i, gen_res, primes[i]);
-      $finish(1);
+      $error("FAILED -- I=%d, PRIME=%d (should be %d)", i, gen_res, primes[i]);
     end
 
     // Ask for next prime
@@ -74,7 +70,6 @@ initial begin
     @(posedge gen_ready);
   end
 
-  $display("Time to compute %d primes: %t", N, $time);
   $display("primogen_tb SUCCEEDED");
   $finish;
 end
