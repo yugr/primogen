@@ -15,8 +15,8 @@ localparam WIDTH = 1 << WIDTH_LOG;
 localparam HI = WIDTH - 1;
 localparam MAX = {WIDTH{1'b1}};
 
-// Note that incrementing width by 1 bit
-// would double BRAM consumption
+// Note that incrementing address width
+// by 1 bit would double BRAM consumption
 localparam ADDR_WIDTH = 8;
 localparam ADDR_HI = ADDR_WIDTH - 1;
 `ifdef SIM
@@ -34,15 +34,14 @@ localparam READY = 4'd0;
 localparam ERROR = 4'd1;
 localparam NEXT_CANDIDATE = 4'd2;
 localparam NEXT_PRIME_DIVISOR = 4'd3;
-localparam PRIME_DIVIDE_DLY = 4'd4;  // TODO: can we get rid of this?
+localparam PRIME_DIVIDE_START = 4'd4;  // TODO: can we get rid of this?
 localparam PRIME_DIVIDE_WAIT = 4'd5;
 localparam NEXT_DIVISOR = 4'd6;
-localparam DIVIDE_DLY = 4'd7;  // TODO: can we get rid of this?
+localparam DIVIDE_START = 4'd7;  // TODO: can we get rid of this?
 localparam DIVIDE_WAIT = 4'd8;
 
 // Combinational logic for outputs
 reg [HI:0] next_res;
-reg [HI:0] next_res_squared;
 wire next_ready;
 wire next_error;
 
@@ -52,6 +51,7 @@ reg [HI:0] res_squared;
 
 // And it's combinational logic
 reg [3:0] next_state;
+reg [HI:0] next_res_squared;
 
 // Submodule inputs
 reg [HI:0] div;
@@ -76,15 +76,16 @@ wire [HI:0] rem;
 wire [HI:0] dout;
 wire [HI:0] dout_squared;
 
+// We store both primes and their squares
 ram #(.WIDTH(2*WIDTH), .ADDR_WIDTH(ADDR_WIDTH)) primes(
   .din({res, res_squared}),
-  .addr(addr),  // Save one cycle by feeding combinational input
+  .addr(addr),
   .write_en(write_en),
   .clk(clk),
   .dout({dout, dout_squared})
 );
 
-divrem #(.WIDTH_LOG(WIDTH_LOG)) d_m(
+divrem #(.WIDTH_LOG(WIDTH_LOG)) dr(
   .clk(clk),
   .go(div_go),
   .rst(rst),
@@ -133,13 +134,14 @@ always @* begin
           default:
             begin
               next_res = res + 8'd2;
-              next_res_squared = res_squared + (res << 2) + 8'd4;
+              // Square is subject to overflow
+              if (next_res < (1'd1 << (WIDTH / 2))) begin
+                next_res_squared = res_squared + (res << 2) + 8'd4;
+                `assert_lt(res_squared, next_res_squared);
+              end else
+                next_res_squared = MAX;
             end
         endcase
-
-        // Clamp square as it's subject to overflow
-        if (next_res_squared <= res_squared)
-          next_res_squared = MAX;
 
         next_addr = 0;
 
@@ -148,7 +150,7 @@ always @* begin
       end
 
     NEXT_PRIME_DIVISOR:
-      if (dout_squared > res) begin
+      if (naddrs == 0 || dout_squared > res) begin
         next_state = READY;
         // Store found prime
         if (res != 1'd1 && res != 2'd2) begin
@@ -157,29 +159,22 @@ always @* begin
           next_naddrs = naddrs + 1'd1;
         end
       end else if (addr < naddrs) begin
-        next_state = PRIME_DIVIDE_DLY;
+        next_state = PRIME_DIVIDE_START;
         next_div = dout;
         next_div_squared = dout_squared;
         next_div_go = 1;
       end else if (naddrs == ADDR_MAX) begin
         // Prime table overflow => use slow check
         next_state = NEXT_DIVISOR;
-        next_div = 8'd2;
-        next_div_squared = 8'd4;
-        // TODO: we could start immediately from last prime divisor
-        // but we need to store prime squares as well.
+        next_div = div + 8'd2;
+        next_div_squared = div_squared + (div << 2) + 8'd4;
+        `assert_lt(div_squared, next_div_squared);
       end else begin
-        // TODO: can this be removed?
-        next_state = READY;
-        // Store found prime
-        if (res != 1'd1 && res != 2'd2) begin
-          next_write_en = 1'd1;
-          next_addr = naddrs;
-          next_naddrs = naddrs + 1'd1;
-        end
+        next_state = ERROR;
+        `unreachable;
       end
 
-    PRIME_DIVIDE_DLY:
+    PRIME_DIVIDE_START:
       // Wait state to allow divrem to register inputs and update ready bit
       next_state = PRIME_DIVIDE_WAIT;
 
@@ -203,11 +198,11 @@ always @* begin
         // None of potential divisors matched => number is prime!
         next_state = READY;
       end else begin
-        next_state = DIVIDE_DLY;
+        next_state = DIVIDE_START;
         next_div_go = 1;
       end
 
-    DIVIDE_DLY:
+    DIVIDE_START:
       // Wait state to allow divrem to register inputs and update ready bit
       next_state = DIVIDE_WAIT;
 
@@ -271,10 +266,9 @@ always @(posedge clk)
   if (rst) begin
     // Start by outputting the very first prime...
     state <= READY;
-    res <= 1;
+    res_squared <= 1;
 
     res <= 1;
-    res_squared <= 1;
     ready <= 1;
     error <= 0;
 
@@ -287,9 +281,9 @@ always @(posedge clk)
     write_en <= 0;
   end else begin
     state <= next_state;
+    res_squared <= next_res_squared;
 
     res <= next_res;
-    res_squared <= next_res_squared;
     ready <= next_ready;
     error <= next_error;
 
