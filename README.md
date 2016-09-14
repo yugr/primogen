@@ -52,8 +52,8 @@ $ make test
 
 # TODO
 
-* get rid of useless states and clean up code
 * use SystemVerilog assertions
+* increase frequency (by optimizing critical paths and [using PLL](https://www.reddit.com/r/yosys/comments/3yrq6d/are_plls_supported_on_the_icestick_hw/))
 * get code reviewed by more professional designers and fix accordingly
 * add UART output
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))
