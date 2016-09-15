@@ -2,21 +2,20 @@
 
 module divrem #(
   parameter WIDTH_LOG = 4
-) (
-  input clk,
-  input go,
-  input rst,
-  // TODO: can I somehow use the HI definition from below?
-  input [(1 << WIDTH_LOG) - 1:0] num,
-  input [(1 << WIDTH_LOG) - 1:0] den,
-  output reg ready,
-  output reg error,
-  output reg [(1 << WIDTH_LOG) - 1:0] quot,
-  output reg [(1 << WIDTH_LOG) - 1:0] rem
-);
+) (clk, go, rst, num, den, ready, error, quot, rem);
 
 localparam WIDTH = 1 << WIDTH_LOG;
 localparam HI = WIDTH - 1;
+
+input clk;
+input go;
+input rst;
+input [HI:0] num;
+input [HI:0] den;
+output reg ready;
+output reg error;
+output reg [HI:0] quot;
+output reg [HI:0] rem;
 
 localparam XW = {WIDTH{1'bx}};
 localparam X7 = 7'bx;

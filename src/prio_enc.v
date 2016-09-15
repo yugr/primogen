@@ -2,12 +2,13 @@
 
 module prio_enc #(
   parameter WIDTH_LOG = 4
-) (
-  input [(1 << WIDTH_LOG) - 1:0] x,
-  output reg [7:0] msb
-);
+) (x, msb);
 
 localparam WIDTH = 1 << WIDTH_LOG;
+localparam HI = WIDTH - 1;
+
+input [HI:0] x;
+output reg [7:0] msb;
 
 `define FAST
 
@@ -18,7 +19,7 @@ integer i;
 
 always @* begin
   msb = 0;
-  for (i = WIDTH - 1; i >= 0; i = i - 1)
+  for (i = HI; i >= 0; i = i - 1)
     if (!msb && x[i])
       msb = i;
 end
@@ -27,7 +28,7 @@ end
 // is decreasing in size...
 
 integer i, start, width;
-reg [WIDTH - 1:0] part;
+reg [HI:0] part;
 
 always @* begin
   start = 0;

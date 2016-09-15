@@ -2,17 +2,18 @@
 
 module primogen #(
   parameter WIDTH_LOG = 4
-) (
-  input clk,
-  input go,
-  input rst,
-  output reg ready,
-  output reg error,
-  output reg [(1 << WIDTH_LOG) - 1:0] res
-);
+) (clk, go, rst, ready, error, res);
 
 localparam WIDTH = 1 << WIDTH_LOG;
 localparam HI = WIDTH - 1;
+
+input clk;
+input go;
+input rst;
+output reg ready;
+output reg error;
+output reg [HI:0] res;
+
 localparam MAX = {WIDTH{1'b1}};
 
 // Note that incrementing address width

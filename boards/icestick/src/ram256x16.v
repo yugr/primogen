@@ -8,14 +8,16 @@ This file shouldn't be used in simulation...
 // Hopefully 256x16 is universally synthesizable
 // across different HW/tools vendors (otherwise
 // we can switch to 512x8).
-module ram256x16(
-  input [15:0] din,
-  input [7:0] addr,
-  input write_en,
-  input clk,
+module ram256x16(din, addr, write_en, clk, dout);
+
+input [15:0] din;
+input [7:0] addr;
+input write_en;
+input clk;
 
 `ifdef INFER_BRAM
-  output reg [15:0] dout);
+
+output reg [15:0] dout;
 
 reg [15:0] mem [255:0];  // 16 * 256 == 4K
 
@@ -26,7 +28,8 @@ always @(posedge clk) begin
 end
 
 `else
-  output [15:0] dout);
+
+output [15:0] dout;
 
 SB_RAM256x16 ram_inst (
   .RDATA(out),
