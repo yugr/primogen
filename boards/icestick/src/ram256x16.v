@@ -2,6 +2,9 @@
 This file shouldn't be used in simulation...
 `endif
 
+// Disable to use BRAM primitives
+`define INFER_BRAM 1
+
 // Hopefully 256x16 is universally synthesizable
 // across different HW/tools vendors (otherwise
 // we can switch to 512x8).
@@ -10,12 +13,9 @@ module ram256x16(
   input [7:0] addr,
   input write_en,
   input clk,
-  output reg [15:0] dout);
-
-// Disable to use BRAM primitives
-`define INFER_BRAM 1
 
 `ifdef INFER_BRAM
+  output reg [15:0] dout);
 
 reg [15:0] mem [255:0];  // 16 * 256 == 4K
 
@@ -26,8 +26,7 @@ always @(posedge clk) begin
 end
 
 `else
-
-wire [15:0] out;
+  output [15:0] dout);
 
 SB_RAM256x16 ram_inst (
   .RDATA(out),
@@ -42,9 +41,6 @@ SB_RAM256x16 ram_inst (
   .WE(write_en),
   .MASK(16'b0)  // Negative logic
 );
-
-always @(posedge clk)
-  dout <= out;
 
 `endif
 
