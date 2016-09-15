@@ -4,7 +4,10 @@ module por(
 
   // Not sure it's universally synthesizable
   // but ok for iCEstick.
-  reg por_done = 0; /*synthesis syn_preserve = 1*/
+
+  // Assuming regs below are initialized to 0
+  // (explicit init will trigger warnigns on some toolchains)
+  reg por_done; /* synthesis syn_preserve = 1 */
   reg [3:0] count; /* synthesis syn_preserve = 1 */
 
   always @(posedge clk) begin
