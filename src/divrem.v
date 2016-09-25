@@ -35,9 +35,9 @@ reg [1:0] state;
 
 wire [HI:0] a;
 wire [HI:0] sub;
-wire [7:0] rem_msb;
-wire [7:0] den_msb;
-wire [7:0] shift;
+wire [WIDTH_LOG - 1:0] rem_msb;
+wire [WIDTH_LOG - 1:0] den_msb;
+wire [WIDTH_LOG - 1:0] shift;
 
 prio_enc #(.WIDTH_LOG(WIDTH_LOG)) num_pe(.x(a), .msb(rem_msb));
 prio_enc #(.WIDTH_LOG(WIDTH_LOG)) den_pe(.x(den), .msb(den_msb));
