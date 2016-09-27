@@ -30,6 +30,14 @@ test-%: bin/%_tb
 test-bench: bin/primogen_bench
 	@vvp $<
 
+test-all:
+	$(MAKE) clean all
+	$(MAKE) -C boards/icestick -f Makefile.yosys clean all
+	$(MAKE) -C boards/icestick clean all
+	$(MAKE) -C boards/icestick clean all USE_LSE=1
+	$(MAKE) test
+	$(MAKE) -C boards/icestick test
+
 clean:
 	rm -f bin/*
 

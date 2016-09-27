@@ -39,12 +39,12 @@ wire [WIDTH_LOG - 1:0] rem_msb;
 wire [WIDTH_LOG - 1:0] den_msb;
 wire [WIDTH_LOG - 1:0] shift;
 
+// TODO: pipeline this to increase freq?
 prio_enc #(.WIDTH_LOG(WIDTH_LOG)) num_pe(.x(a), .msb(rem_msb));
 prio_enc #(.WIDTH_LOG(WIDTH_LOG)) den_pe(.x(den), .msb(den_msb));
 
 assign a = state == READY || state == ERROR ? num : rem;
 
-// TODO: pipeline this to increase freq?
 assign shift = rem_msb > den_msb ? (rem_msb - den_msb - 8'b1) : 8'b0;
 
 assign sub = den << shift;
@@ -86,7 +86,6 @@ end
 always @(posedge clk)
   if (rst) begin
     // TODO: is it num good practice to explicitly undefine all things?
-    // TODO: best approach to unify code snippets like this one?
     state <= READY;
     quot <= XW;
     rem <= XW;
