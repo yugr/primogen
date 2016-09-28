@@ -70,7 +70,7 @@ initial begin
     @(posedge gen_ready);
   end
 
-  $display("primogen_tb SUCCEEDED");
+  $display("primogen_tb ENDED");
   $finish;
 end
 

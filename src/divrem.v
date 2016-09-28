@@ -85,7 +85,7 @@ end
 
 always @(posedge clk)
   if (rst) begin
-    // TODO: is it num good practice to explicitly undefine all things?
+    // TODO: is it a good practice to explicitly undefine everything?
     state <= READY;
     quot <= XW;
     rem <= XW;
@@ -98,6 +98,58 @@ always @(posedge clk)
     ready <= next_ready;
     error <= next_error;
   end
+
+`ifdef SIM
+reg [HI:0] ready_prev;
+reg [HI:0] go_r;
+reg [HI:0] go_prev;
+reg [HI:0] num_prev;
+reg [HI:0] den_prev;
+
+always @(posedge clk) begin
+  ready_prev <= ready;
+  go_r <= go;
+  go_prev <= go_r;
+  num_prev <= num;
+  den_prev <= den;
+
+  // Precondition: core signals must always be valid
+  `assert_nox(rst);
+  `assert_nox(clk);
+
+  if (!rst) begin
+    // Precondition: if 'go' is asserted, other inputs are valid
+    if (go) begin
+      `assert_nox(num);
+      `assert_nox(den);
+    end
+
+    // Precondition: inputs are stable until computation is over
+    if (!ready) begin
+      `assert_eq(num, num_prev);
+      `assert_eq(den, den_prev);
+    end
+
+    // Precondition: 'go' is not re-asserted until computation is finished
+    // (this won't be a bug but would be ignored and is likely to indicate
+    // incorrect usage of module).
+    if (!ready)
+      `assert(!(go && !go_prev));
+
+    // Invariant: priority encoder produces defined results
+    if (!`isunknown(den))
+      `assert_nox(den_msb);
+    if (!`isunknown(rem))
+      `assert_nox(rem_msb);
+
+    // Postcondition: outputs are correct
+    if (ready && !ready_prev && !error) begin
+      `assert_lt(rem, den);
+      `assert_eq(den*quot + rem, num);
+    end
+  end
+end
+`endif
 
 `ifdef SIM
 //  initial

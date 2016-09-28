@@ -113,9 +113,11 @@ always @* begin
 
   case (state)
     READY, ERROR:
-      if (go) begin
-        next_state = NEXT_CANDIDATE;
-        next_addr = 0;
+      begin
+        if (go) begin
+          next_state = NEXT_CANDIDATE;
+          next_addr = 0;
+        end
       end
 
     NEXT_CANDIDATE:  // TODO: can probably be merged with NEXT_PRIME_DIVISOR
@@ -296,6 +298,21 @@ always @(posedge clk)
     naddrs <= next_naddrs;
     write_en <= next_write_en;
   end
+
+`ifdef SIM
+
+always @(posedge clk) begin
+  // Precondition: core signals must always be valid
+  `assert_nox(rst);
+  `assert_nox(clk);
+
+  if (!rst) begin
+    // Invariant: output looks like prime
+    `assert(res[0] || (res == 2));
+  end
+end
+
+`endif
 
 `ifdef SIM
 //  initial

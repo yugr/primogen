@@ -54,7 +54,7 @@ initial begin
       $error("FAILED -- A=%d, B=%d, MOD=%d (should be %d)", num, den, m1_rem, quot);
     end
   end
-  $display("divrem_tb SUCCEEDED");
+  $display("divrem_tb ENDED");
   $finish;
 end
 
