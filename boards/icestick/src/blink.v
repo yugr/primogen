@@ -2,11 +2,11 @@
 // and displays lower 5 bits via LEDs.
 
 module blink (
-  input clk,
+  input clk_12MHz,
   output [4:0] LED);
 
-  reg [27:0] clk_count;
-  reg pulse_5_sec;
+  reg [31:0] clk_count;
+  reg blink;
 
   // WLOG=5 (i.e. 32-bit primes) takes a LOT more time to build...
   localparam WLOG = 4;
@@ -18,8 +18,13 @@ module blink (
   wire [HI:0] res;
 
   wire rst;
+  wire clk;
 
-  por por_isnt(.clk(clk), .rst(rst));
+  // TODO: pass from outside and verify?
+  localparam F = 16;
+
+  clk_gen #(.F(F)) clk_gen_inst (.clk_12MHz(clk_12MHz), .clk(clk));
+  por por_inst(.clk(clk), .rst(rst));
 
   primogen #(.WIDTH_LOG(WLOG)) pg(
     .clk(clk),
@@ -29,19 +34,18 @@ module blink (
     .error(err),
     .res(res));
 
-  // clk is 12 MHz
-  localparam DIV = 28'd12000000 * 28'd5;
+  localparam BLINK_COUNT = F * 1000000 * 5;  // Every 5 sec.
 
   always @(posedge clk) begin
     if (rst) begin
-      pulse_5_sec <= 0;
+      blink <= 0;
       clk_count <= 0;
     end else begin
-      if (clk_count == DIV) begin
-        pulse_5_sec <= 1;
+      if (clk_count == BLINK_COUNT) begin
+        blink <= 1;
         clk_count <= 1'd0;
       end else begin
-        pulse_5_sec <= 0;
+        blink <= 0;
         clk_count <= clk_count + 1'd1;
       end
     end
@@ -53,7 +57,7 @@ module blink (
     end else begin
       go <= 0;
       // !go - give primogen 1 clock to register inputs
-      if (rdy && !err && !go && pulse_5_sec) begin
+      if (rdy && !err && !go && blink) begin
         go <= 1;
       end
     end

@@ -1,6 +1,6 @@
 $(shell mkdir -p bin)
 
-SRC = ../../src/divrem.v ../../src/primogen.v ../../src/prio_enc.v src/ram.v src/ram256x16.v src/por.v
+SRC = ../../src/divrem.v ../../src/primogen.v ../../src/prio_enc.v src/ram.v src/ram256x16.v src/por.v src/clk_gen.v
 
 all: bin/blink.bin bin/bench.bin
 
@@ -19,6 +19,6 @@ bin/%.blif: src/%.v $(SRC)
 clean:
 	rm -rf bin/*
 
-.PRECIOUS: bin/%.edf bin/%.asc
+.PRECIOUS: bin/%.blif bin/%.asc
 
 .PHONY: clean all

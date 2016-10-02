@@ -1,6 +1,6 @@
 # See http://www.pighixxx.com/test/portfolio-items/icestick/
 
-set_io clk 21
+set_io clk_12MHz 21
 
 # === LEDs ===
 #       0

@@ -8,7 +8,8 @@ add_file -verilog ../src/bench.v
 add_file -verilog ../src/ram.v
 add_file -verilog ../src/ram256x16.v
 add_file -verilog ../src/por.v
-#add_file -constraint -lib work "primogen.sdc"
+add_file -verilog ../src/clk_gen.v
+add_file -constraint -lib work "primogen.sdc"
 
 set_option -top_module bench
 

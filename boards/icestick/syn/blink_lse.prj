@@ -6,7 +6,7 @@
 -t TQ144
 
 # constraints
-#-sdc "syn/blink_design.sdc"
+-sdc "syn/primogen.sdc"
 
 # options
 #-frequency 200
@@ -37,6 +37,7 @@
 -ver "boards/icestick/src/ram256x16.v"
 -ver "boards/icestick/src/ram.v"
 -ver "boards/icestick/src/por.v"
+-ver "boards/icestick/src/clk_gen.v"
 -p "../.."
 -top blink
 

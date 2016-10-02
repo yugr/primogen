@@ -32,7 +32,7 @@ bin/sbt/outputs/bitmap/%_bitmap.bin: bin/%.edf syn/icestick.pcf backend.tcl
 	grep 'Frequency:' bin/sbt/outputs/router/blink_timing.rpt
 
 ifeq ($(USE_LSE), 1)
-bin/%.edf: syn/%_lse.prj src/%.v src/ram*.v src/por.v ../../src/*
+bin/%.edf: syn/%_lse.prj src/%.v src/ram*.v src/por.v src/clk_gen.v ../../src/*
 	. ./set_vars.sh $(ICE_ROOT)
 	rm -f $@
 	$$LSE_SYN -f $<
@@ -41,7 +41,7 @@ bin/%.edf: syn/%_lse.prj src/%.v src/ram*.v src/por.v ../../src/*
 	# Synplify does not know about error codes so check
 	test -f $@
 else
-bin/%.edf: syn/%_synp.prj src/%.v src/ram*.v src/por.v ../../src/*
+bin/%.edf: syn/%_synp.prj src/%.v src/ram*.v src/por.v src/clk_gen.v ../../src/*
 	. ./set_vars.sh $(ICE_ROOT)
 	rm -f $@
 	rc=0

@@ -3,8 +3,8 @@
 // Surrounding LEDs are used to mark progress.
 
 module bench (
-  input clk,
-  output [4:0] LED);
+  input clk_12MHz,
+  output reg [4:0] LED);
 
   // WLOG=5 (i.e. 32-bit primes) takes a LOT more time to build...
   localparam WLOG = 4;
@@ -12,9 +12,8 @@ module bench (
   localparam HI = W - 1;
   localparam MAX = {W{1'd1}};
 
-  localparam LED_STEP_1 = MAX / 5'd16;
-  localparam LED_STEP = LED_STEP_1 + (LED_STEP_1 * 5'd16 < MAX ? 1'd1 : 1'd0);
-  reg [HI:0] leds_num;
+  localparam COUNT_PER_LED_TICK = MAX / 5'd16 + 1'd1;
+  reg [HI:0] bound;
 
   reg go;
   wire rdy, err;
@@ -22,7 +21,12 @@ module bench (
   reg [HI:0] prime;
 
   wire rst;
+  wire clk;
 
+  // TODO: pass from outside and verify?
+  localparam F = 16;
+
+  clk_gen #(.F(F)) clk_gen_inst (.clk_12MHz(clk_12MHz), .clk(clk));
   por por_inst(.clk(clk), .rst(rst));
 
   primogen #(.WIDTH_LOG(WLOG)) pg(
@@ -50,15 +54,14 @@ module bench (
 
   always @(posedge clk) begin
     if (rst) begin
-      leds_num <= 0;
+      bound <= COUNT_PER_LED_TICK;
     end else begin
-      if (prime > leds_num) begin
-        leds_num <= leds_num + LED_STEP;
+      LED[4] <= err;
+      if (prime > bound) begin
+        bound <= bound + COUNT_PER_LED_TICK;
+        LED[3:0] <= LED[3:0] + 1'd1;
       end
     end
   end
-
-  assign LED[3:0] = leds_num;
-  assign LED[4] = err;  // Overflow
 
 endmodule

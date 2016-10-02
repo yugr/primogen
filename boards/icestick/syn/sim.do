@@ -12,7 +12,7 @@ run
 endsim
 alib bin/blink
 set worklib blink
-alog +define+SIM ../../src/primogen.v ../../src/divrem.v ../../src/prio_enc.v ../../src/ram.v src/por.v src/blink.v
+alog +define+SIM ../../src/primogen.v ../../src/divrem.v ../../src/prio_enc.v ../../src/ram.v src/por.v src/clk_gen.v src/blink.v
 asim blink
 run 1000
 endsim
