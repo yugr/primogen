@@ -45,7 +45,7 @@ prio_enc #(.WIDTH_LOG(WIDTH_LOG)) den_pe(.x(den), .msb(den_msb));
 
 assign a = state == READY || state == ERROR ? num : rem;
 
-assign shift = rem_msb > den_msb ? (rem_msb - den_msb - 8'b1) : 8'b0;
+assign shift = rem_msb > den_msb ? (rem_msb - den_msb - 1'b1) : 1'b0;
 
 assign sub = den << shift;
 
