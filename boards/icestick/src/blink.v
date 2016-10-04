@@ -5,26 +5,30 @@ module blink (
   input clk_12MHz,
   output [4:0] LED);
 
-  reg [31:0] clk_count;
-  reg blink;
-
   // WLOG=5 (i.e. 32-bit primes) takes a LOT more time to build...
   localparam WLOG = 4;
   localparam W = 1 << WLOG;
   localparam HI = W - 1;
 
-  reg go;
   wire rdy, err;
   wire [HI:0] res;
 
+  reg go;
+  reg [31:0] clk_count;
+  reg blink;
+
   wire rst;
+  wire por_rst;
   wire clk;
+  wire clk_rdy;
 
   // TODO: pass from outside and verify?
   localparam F = 16;
 
-  clk_gen #(.F(F)) clk_gen_inst (.clk_12MHz(clk_12MHz), .clk(clk));
-  por por_inst(.clk(clk), .rst(rst));
+  clk_gen #(.F(F)) clk_gen_inst (.clk_12MHz(clk_12MHz), .clk(clk), .ready(clk_rdy));
+  por por_inst(.clk(clk), .rst(por_rst));
+
+  assign rst = por_rst || !clk_rdy;
 
   primogen #(.WIDTH_LOG(WLOG)) pg(
     .clk(clk),
@@ -43,7 +47,7 @@ module blink (
     end else begin
       if (clk_count == BLINK_COUNT) begin
         blink <= 1;
-        clk_count <= 1'd0;
+        clk_count <= 0;
       end else begin
         blink <= 0;
         clk_count <= clk_count + 1'd1;
