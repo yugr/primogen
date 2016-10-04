@@ -1,3 +1,6 @@
+`ifndef DEFINES_VH
+`define DEFINES_VH
+
 `ifdef synthesis
 `ifdef SIM
 SIM and synthesis should not be defined simultaneously
@@ -43,3 +46,4 @@ SIM and SYNTHESIS should not be defined simultaneously
 `define unreachable
 `endif
 
+`endif

@@ -31,6 +31,8 @@ end
 
 output [15:0] dout;
 
+// FIXME: explicit clock enables may not be necessary
+
 SB_RAM256x16 ram_inst (
   .RDATA(out),
   .RADDR(addr),
