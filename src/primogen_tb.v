@@ -52,13 +52,13 @@ initial begin
 
   for (i = 0; i < N; ++i) begin
     if (!gen_ready) begin
-      $error("FAILED -- I=%d, READY=0", i);
+      $fatal(1, "FAILED -- I=%d, READY=0", i);
     end else if (gen_error) begin
-      $error("FAILED -- I=%d, ERROR=1", i);
+      $fatal(1, "FAILED -- I=%d, ERROR=1", i);
     end else if (^gen_res === 1'bx) begin
-      $error("FAILED -- I=%d, UNDEF (%d)", i, gen_res);
+      $fatal(1, "FAILED -- I=%d, UNDEF (%d)", i, gen_res);
     end else if (gen_res != primes[i]) begin
-      $error("FAILED -- I=%d, PRIME=%d (should be %d)", i, gen_res, primes[i]);
+      $fatal(1, "FAILED -- I=%d, PRIME=%d (should be %d)", i, gen_res, primes[i]);
     end
 
     // Ask for next prime

@@ -45,13 +45,13 @@ initial begin
     rem = num / den;
     quot = num % den;
     if (!m1_ready) begin
-      $error("FAILED -- A=%d, B=%d, READY=0", num, den);
+      $fatal(1, "FAILED -- A=%d, B=%d, READY=0", num, den);
     end else if (den != 0 && (^m1_div === 1'bx || ^m1_rem === 1'bx)) begin
-      $error("FAILED -- A=%d, B=%d, UNDEF (%d %d)", num, den, m1_div, m1_rem);
+      $fatal(1, "FAILED -- A=%d, B=%d, UNDEF (%d %d)", num, den, m1_div, m1_rem);
     end else if (rem != m1_div) begin
-      $error("FAILED -- A=%d, B=%d, DIV=%d (should be %d)", num, den, m1_div, rem);
+      $fatal(1, "FAILED -- A=%d, B=%d, DIV=%d (should be %d)", num, den, m1_div, rem);
     end else if (quot != m1_rem) begin
-      $error("FAILED -- A=%d, B=%d, MOD=%d (should be %d)", num, den, m1_rem, quot);
+      $fatal(1, "FAILED -- A=%d, B=%d, MOD=%d (should be %d)", num, den, m1_rem, quot);
     end
   end
   $display("divrem_tb ENDED");
