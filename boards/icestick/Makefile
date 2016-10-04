@@ -28,8 +28,8 @@ bin/sbt/outputs/bitmap/%_bitmap.bin: bin/%.edf syn/icestick.pcf backend.tcl
 	. ./set_vars.sh $(ICE_ROOT)
 	rm -f $@
 	$$TCL ./backend.tcl $*
-	grep 'LUTs:' bin/sbt/outputs/packer/blink_pack.rpt
-	grep 'Frequency:' bin/sbt/outputs/router/blink_timing.rpt
+	grep 'LUTs:' bin/sbt/outputs/packer/$*_pack.rpt
+	grep 'Frequency:' bin/sbt/outputs/router/$*_timing.rpt
 
 ifeq ($(USE_LSE), 1)
 bin/%.edf: syn/%_lse.prj src/%.v src/ram*.v src/por.v src/clk_gen.v ../../src/*
