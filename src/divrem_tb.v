@@ -1,9 +1,11 @@
+`include "defines.vh"
+
 module divrem_tb;
 
 reg clk = 0;
+wire rst;
 
 reg go = 0;
-wire rst;
 reg [15:0] num = 0;
 reg [15:0] den = 0;
 
@@ -46,7 +48,7 @@ initial begin
     quot = num % den;
     if (!m1_ready) begin
       $fatal(1, "FAILED -- A=%d, B=%d, READY=0", num, den);
-    end else if (den != 0 && (^m1_quot === 1'bx || ^m1_rem === 1'bx)) begin
+    end else if (den != 0 && (`isunknown(m1_quot) || `isunknown(m1_rem))) begin
       $fatal(1, "FAILED -- A=%d, B=%d, UNDEF (%d %d)", num, den, m1_quot, m1_rem);
     end else if (rem != m1_quot) begin
       $fatal(1, "FAILED -- A=%d, B=%d, DIV=%d (should be %d)", num, den, m1_quot, rem);

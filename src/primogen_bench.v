@@ -1,12 +1,14 @@
 module primogen_bench;
 
 reg clk = 0;
-reg go = 0;
 wire rst;
+
+reg go = 0;
 reg [31:0] clk_count = 0;
 reg [31:0] res_count = 0;
 reg overflow = 0;
 
+wire [15:0] gen_res;
 wire gen_ready;
 wire gen_error;
 
@@ -18,6 +20,7 @@ primogen gen(
   .clk(clk),
   .go(go),
   .rst(rst),
+  .res(gen_res),
   .ready(gen_ready),
   .error(gen_error));
 
@@ -43,7 +46,7 @@ initial begin
       res_count = res_count + 1;
   end
 
-  $display("primogen_bench SUCCEEDED: Computed %0d primes (in %0d cycles), %soverflow", res_count, clk_count, overflow ? "" : "no ");
+  $display("primogen_bench SUCCEEDED: Computed %0d primes in %0d cycles, last prime is %d, %soverflow", res_count, clk_count, gen_res, overflow ? "" : "no ");
   $finish;
 end
 

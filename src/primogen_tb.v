@@ -1,18 +1,18 @@
+`include "defines.vh"
+
 module primogen_tb;
 
 reg clk = 0;
+wire rst;
 
 reg go = 0;
-wire rst;
-reg [15:0] a = 0;
-reg [15:0] b = 0;
 
 wire gen_ready;
 wire gen_error;
 wire [15:0] gen_res;
 
-parameter N = 13;
-reg [99:0] primes [31:0];
+localparam N = 50;
+reg [15:0] primes [N - 1:0];
 integer i;
 
 por pos_inst(
@@ -44,9 +44,43 @@ initial begin
   primes[10] = 29;
   primes[11] = 31;
   primes[12] = 37;
-
-  for (i = N; i < 100; i = i + 1)
-    primes[i] = 0;
+  primes[13] = 41;
+  primes[14] = 43;
+  primes[15] = 47;
+  primes[16] = 53;
+  primes[17] = 59;
+  primes[18] = 61;
+  primes[19] = 67;
+  primes[20] = 71;
+  primes[21] = 73;
+  primes[22] = 79;
+  primes[23] = 83;
+  primes[24] = 89;
+  primes[25] = 97;
+  primes[26] = 101;
+  primes[27] = 103;
+  primes[28] = 107;
+  primes[29] = 109;
+  primes[30] = 113;
+  primes[31] = 127;
+  primes[32] = 131;
+  primes[33] = 137;
+  primes[34] = 139;
+  primes[35] = 149;
+  primes[36] = 151;
+  primes[37] = 157;
+  primes[38] = 163;
+  primes[39] = 167;
+  primes[40] = 173;
+  primes[41] = 179;
+  primes[42] = 181;
+  primes[43] = 191;
+  primes[44] = 193;
+  primes[45] = 197;
+  primes[46] = 199;
+  primes[47] = 211;
+  primes[48] = 223;
+  primes[49] = 227;
 
   wait (!rst);
 
@@ -55,7 +89,7 @@ initial begin
       $fatal(1, "FAILED -- I=%d, READY=0", i);
     end else if (gen_error) begin
       $fatal(1, "FAILED -- I=%d, ERROR=1", i);
-    end else if (^gen_res === 1'bx) begin
+    end else if (`isunknown(gen_res)) begin
       $fatal(1, "FAILED -- I=%d, UNDEF (%d)", i, gen_res);
     end else if (gen_res != primes[i]) begin
       $fatal(1, "FAILED -- I=%d, PRIME=%d (should be %d)", i, gen_res, primes[i]);
