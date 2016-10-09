@@ -112,13 +112,16 @@ always @* begin
   next_write_en = 0;
 
   case (state)
-    READY, ERROR:
+    READY:
       begin
         if (go) begin
           next_state = NEXT_CANDIDATE;
           next_addr = 0;
         end
       end
+
+    ERROR:
+      ;  // Do nothing
 
     NEXT_CANDIDATE:  // TODO: can probably be merged with NEXT_PRIME_DIVISOR
       begin
