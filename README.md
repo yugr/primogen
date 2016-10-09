@@ -52,13 +52,13 @@ $ make test
 
 # TODO
 
-* ensure correctness (!)
-* use $random instead of Xs (?)
+* add UART output and use to autotest HW
+* ensure correctness (currently generator seems to loose some primes...)
 * increase frequency (by optimizing critical paths and [using PLL](https://www.reddit.com/r/yosys/comments/3yrq6d/are_plls_supported_on_the_icestick_hw/))
-* get code reviewed by more professional designers and fix accordingly
 * get rid of useless pipeline stages
+* use $random instead of Xs (?)
+* get code reviewed by more professional designers and fix accordingly
 * other TODOs and FIXMEs in code
-* add UART output (can be used for HW autotests)
 * use [Fermat test](https://en.wikipedia.org/wiki/Fermat_primality_test) (and [quick exp](https://en.wikipedia.org/wiki/Modular_exponentiation))
 * automatically explore synthesis options to generate more efficient design
 
